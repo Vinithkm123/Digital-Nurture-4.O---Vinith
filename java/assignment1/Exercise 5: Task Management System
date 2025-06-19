@@ -1,0 +1,153 @@
+## Exercise 5: Task Management System
+
+class Task {
+    int taskId;
+    String taskName;
+    String status;
+
+    public Task(int taskId, String taskName, String status) {
+        this.taskId = taskId;
+        this.taskName = taskName;
+        this.status = status;
+    }
+
+    @Override
+    public String toString() {
+        return "Task ID: " + taskId + ", Name: " + taskName + ", Status: " + status;
+    }
+}
+
+// TaskNode.java - Represents a node in the linked list
+class TaskNode {
+    Task task;
+    TaskNode next;
+
+    public TaskNode(Task task) {
+        this.task = task;
+        this.next = null;
+    }
+}
+
+// TaskManager.java - Manages the linked list of tasks
+class TaskManager {
+    private TaskNode head;
+
+    // Add task to the end of the list
+    public void addTask(Task task) {
+        TaskNode newNode = new TaskNode(task);
+        if (head == null) {
+            head = newNode;
+        } else {
+            TaskNode current = head;
+            while (current.next != null) {
+                current = current.next;
+            }
+            current.next = newNode;
+        }
+        System.out.println("Task added: " + task.taskName);
+    }
+
+    // Search for a task by ID
+    public Task searchTask(int taskId) {
+        TaskNode current = head;
+        while (current != null) {
+            if (current.task.taskId == taskId) {
+                return current.task;
+            }
+            current = current.next;
+        }
+        return null;
+    }
+
+    // Traverse and print all tasks
+    public void traverseTasks() {
+        if (head == null) {
+            System.out.println("No tasks to display.");
+            return;
+        }
+        TaskNode current = head;
+        while (current != null) {
+            System.out.println(current.task);
+            current = current.next;
+        }
+    }
+
+    // Delete a task by ID
+    public void deleteTask(int taskId) {
+        if (head == null) {
+            System.out.println("List is empty.");
+            return;
+        }
+
+        if (head.task.taskId == taskId) {
+            head = head.next;
+            System.out.println("Task with ID " + taskId + " deleted.");
+            return;
+        }
+
+        TaskNode current = head;
+        while (current.next != null && current.next.task.taskId != taskId) {
+            current = current.next;
+        }
+
+        if (current.next == null) {
+            System.out.println("Task with ID " + taskId + " not found.");
+        } else {
+            current.next = current.next.next;
+            System.out.println("Task with ID " + taskId + " deleted.");
+        }
+    }
+}
+
+// Main.java - Main program to demonstrate task operations
+public class Main {
+    public static void main(String[] args) {
+        TaskManager manager = new TaskManager();
+
+        // Adding tasks
+        manager.addTask(new Task(1, "Design UI", "Pending"));
+        manager.addTask(new Task(2, "Develop Backend", "In Progress"));
+        manager.addTask(new Task(3, "Test Application", "Not Started"));
+
+        // Traversing tasks
+        System.out.println("\n=== All Tasks ===");
+        manager.traverseTasks();
+
+        // Searching for a task
+        System.out.println("\n=== Search Task ===");
+        Task foundTask = manager.searchTask(2);
+        if (foundTask != null) {
+            System.out.println("Found: " + foundTask);
+        } else {
+            System.out.println("Task not found.");
+        }
+
+        // Deleting a task
+        System.out.println("\n=== Delete Task ===");
+        manager.deleteTask(2);
+
+        // Traversing again after deletion
+        System.out.println("\n=== Tasks After Deletion ===");
+        manager.traverseTasks();
+    }
+}
+
+output:
+Task added: Design UI
+Task added: Develop Backend
+Task added: Test Application
+
+=== All Tasks ===
+Task ID: 1, Name: Design UI, Status: Pending
+Task ID: 2, Name: Develop Backend, Status: In Progress
+Task ID: 3, Name: Test Application, Status: Not Started
+
+=== Search Task ===
+Found: Task ID: 2, Name: Develop Backend, Status: In Progress
+
+=== Delete Task ===
+Task with ID 2 deleted.
+
+=== Tasks After Deletion ===
+Task ID: 1, Name: Design UI, Status: Pending
+Task ID: 3, Name: Test Application, Status: Not Started
