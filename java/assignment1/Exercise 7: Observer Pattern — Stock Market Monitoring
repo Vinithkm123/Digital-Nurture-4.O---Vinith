@@ -1,0 +1,121 @@
+## Exercise 7: Observer Pattern — Stock Market Monitoring
+
+import java.util.*;
+
+// Step 2: Subject Interface
+interface Stock {
+    void registerObserver(Observer o);
+    void removeObserver(Observer o);
+    void notifyObservers();
+}
+
+// Step 4: Observer Interface
+interface Observer {
+    void update(String stockName, double price);
+}
+
+// Step 3: Concrete Subject - StockMarket
+class StockMarket implements Stock {
+    private List<Observer> observers = new ArrayList<>();
+    private String stockName;
+    private double price;
+
+    public void setStockData(String stockName, double price) {
+        this.stockName = stockName;
+        this.price = price;
+        notifyObservers(); // Notify all observers when stock changes
+    }
+
+    @Override
+    public void registerObserver(Observer o) {
+        observers.add(o);
+    }
+
+    @Override
+    public void removeObserver(Observer o) {
+        observers.remove(o);
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (Observer o : observers) {
+            o.update(stockName, price);
+        }
+    }
+}
+
+// Step 5: Concrete Observer - Mobile App
+class MobileApp implements Observer {
+    private String user;
+
+    public MobileApp(String user) {
+        this.user = user;
+    }
+
+    @Override
+    public void update(String stockName, double price) {
+        System.out.println("MobileApp (" + user + ") - " + stockName + " updated to $" + price);
+    }
+}
+
+// Step 5: Concrete Observer - Web App
+class WebApp implements Observer {
+    private String user;
+
+    public WebApp(String user) {
+        this.user = user;
+    }
+
+    @Override
+    public void update(String stockName, double price) {
+        System.out.println("WebApp (" + user + ") - " + stockName + " updated to $" + price);
+    }
+}
+
+// ✅ Step 6: Main class with main() method
+public class ObserverPatternExample {
+    public static void main(String[] args) {
+        // Create stock market (subject)
+        StockMarket stockMarket = new StockMarket();
+
+        // Create observers
+        Observer mobile1 = new MobileApp("Alice");
+        Observer mobile2 = new MobileApp("Bob");
+        Observer web = new WebApp("Charlie");
+
+        // Register observers
+        stockMarket.registerObserver(mobile1);
+        stockMarket.registerObserver(mobile2);
+        stockMarket.registerObserver(web);
+
+        // Simulate stock updates
+        System.out.println("---- AAPL Stock Update ----");
+        stockMarket.setStockData("AAPL", 189.12);
+
+        System.out.println("\n---- TSLA Stock Update ----");
+        stockMarket.setStockData("TSLA", 221.77);
+
+        // Remove one observer and update again
+        stockMarket.removeObserver(mobile2);
+
+        System.out.println("\n---- GOOG Stock Update (after Bob removed) ----");
+        stockMarket.setStockData("GOOG", 2987.54);
+    }
+}
+
+Output :
+
+---- AAPL Stock Update ----
+MobileApp (Alice) - AAPL updated to $189.12
+MobileApp (Bob) - AAPL updated to $189.12
+WebApp (Charlie) - AAPL updated to $189.12
+
+---- TSLA Stock Update ----
+MobileApp (Alice) - TSLA updated to $221.77
+MobileApp (Bob) - TSLA updated to $221.77
+WebApp (Charlie) - TSLA updated to $221.77
+
+---- GOOG Stock Update (after Bob removed) ----
+MobileApp (Alice) - GOOG updated to $2987.54
+WebApp (Charlie) - GOOG updated to $2987.54
+
