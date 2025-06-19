@@ -1,3 +1,5 @@
+##  Inventory Management System
+
 class Product {
     int productId;
     String productName;
