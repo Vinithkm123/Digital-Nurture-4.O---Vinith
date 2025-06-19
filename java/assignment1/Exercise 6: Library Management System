@@ -93,7 +93,7 @@ public class Main {
     }
 }
 
-Output:
+Output :
 ? Linear Search:
 Found: Book ID: 102, Title: 1984, Author: George Orwell
 
