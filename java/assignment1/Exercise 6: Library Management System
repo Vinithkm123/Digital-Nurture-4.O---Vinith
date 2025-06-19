@@ -1,0 +1,101 @@
+## Exercise 6: Library Management System
+
+import java.util.Arrays;
+import java.util.Comparator;
+
+// Book class with bookId, title, and author
+class Book {
+    int bookId;
+    String title;
+    String author;
+
+    public Book(int bookId, String title, String author) {
+        this.bookId = bookId;
+        this.title = title.toLowerCase(); // Normalize for comparison
+        this.author = author;
+    }
+
+    @Override
+    public String toString() {
+        return "Book ID: " + bookId + ", Title: " + title + ", Author: " + author;
+    }
+}
+
+// Library class with search methods
+class Library {
+
+    // Linear search by title
+    public static Book linearSearch(Book[] books, String searchTitle) {
+        for (Book book : books) {
+            if (book.title.equalsIgnoreCase(searchTitle)) {
+                return book;
+            }
+        }
+        return null;
+    }
+
+    // Binary search by title (requires sorted books)
+    public static Book binarySearch(Book[] books, String searchTitle) {
+        int low = 0;
+        int high = books.length - 1;
+        searchTitle = searchTitle.toLowerCase(); // Normalize input
+
+        while (low <= high) {
+            int mid = (low + high) / 2;
+            int compare = books[mid].title.compareTo(searchTitle);
+
+            if (compare == 0) {
+                return books[mid];
+            } else if (compare < 0) {
+                low = mid + 1;
+            } else {
+                high = mid - 1;
+            }
+        }
+        return null;
+    }
+}
+
+// Main class to run the program
+public class Main {
+    public static void main(String[] args) {
+        // Sample books
+        Book[] books = {
+            new Book(101, "The Alchemist", "Paulo Coelho"),
+            new Book(102, "1984", "George Orwell"),
+            new Book(103, "To Kill a Mockingbird", "Harper Lee"),
+            new Book(104, "Pride and Prejudice", "Jane Austen"),
+            new Book(105, "Moby Dick", "Herman Melville")
+        };
+
+        String searchTitle = "1984";
+
+        // ---------- Linear Search ----------
+        System.out.println("🔍 Linear Search:");
+        Book resultLinear = Library.linearSearch(books, searchTitle);
+        if (resultLinear != null) {
+            System.out.println("Found: " + resultLinear);
+        } else {
+            System.out.println("Book not found.");
+        }
+
+        // ---------- Binary Search ----------
+        // Sort the array by title before binary search
+        Arrays.sort(books, Comparator.comparing(b -> b.title));
+
+        System.out.println("\n🔍 Binary Search (after sorting):");
+        Book resultBinary = Library.binarySearch(books, searchTitle);
+        if (resultBinary != null) {
+            System.out.println("Found: " + resultBinary);
+        } else {
+            System.out.println("Book not found.");
+        }
+    }
+}
+
+Output:
+? Linear Search:
+Found: Book ID: 102, Title: 1984, Author: George Orwell
+
+? Binary Search (after sorting):
+Found: Book ID: 102, Title: 1984, Author: George Orwell
