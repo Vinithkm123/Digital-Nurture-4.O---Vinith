@@ -1,0 +1,85 @@
+## Exercise 8: Implementing the Strategy Pattern
+
+// Step 2: Strategy Interface
+interface PaymentStrategy {
+    void pay(double amount);
+}
+
+// Step 3: Concrete Strategy - Credit Card Payment
+class CreditCardPayment implements PaymentStrategy {
+    private String cardNumber;
+    private String cardHolder;
+
+    public CreditCardPayment(String cardNumber, String cardHolder) {
+        this.cardNumber = cardNumber;
+        this.cardHolder = cardHolder;
+    }
+
+    @Override
+    public void pay(double amount) {
+        System.out.println("Paid $" + amount + " using Credit Card [" + cardNumber + "] for " + cardHolder);
+    }
+}
+
+// Step 3: Concrete Strategy - PayPal Payment
+class PayPalPayment implements PaymentStrategy {
+    private String email;
+
+    public PayPalPayment(String email) {
+        this.email = email;
+    }
+
+    @Override
+    public void pay(double amount) {
+        System.out.println("Paid $" + amount + " using PayPal account: " + email);
+    }
+}
+
+// Step 4: Context Class
+class PaymentContext {
+    private PaymentStrategy strategy;
+
+    // Set the payment strategy dynamically
+    public void setPaymentStrategy(PaymentStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    // Execute the strategy
+    public void makePayment(double amount) {
+        if (strategy == null) {
+            System.out.println("No payment strategy selected!");
+        } else {
+            strategy.pay(amount);
+        }
+    }
+}
+
+// Step 5: Test Class
+public class StrategyPatternExample {
+    public static void main(String[] args) {
+        PaymentContext context = new PaymentContext();
+
+        // Pay using Credit Card
+        PaymentStrategy creditCard = new CreditCardPayment("1234-5678-9012-3456", "Alice");
+        context.setPaymentStrategy(creditCard);
+        context.makePayment(150.75);
+
+        // Pay using PayPal
+        PaymentStrategy paypal = new PayPalPayment("alice@example.com");
+        context.setPaymentStrategy(paypal);
+        context.makePayment(89.99);
+
+        // No strategy set
+        context.setPaymentStrategy(null);
+        context.makePayment(10.00);
+    }
+}
+
+Output :
+
+Paid $150.75 using Credit Card [1234-5678-9012-3456] for Alice
+Paid $89.99 using PayPal account: alice@example.com
+No payment strategy selected!
+
+
+
