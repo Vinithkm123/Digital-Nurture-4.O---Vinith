@@ -1,0 +1,118 @@
+## Exercise 3: Implementing the Builder Pattern
+
+public class BuilderPatternExample {
+
+    // Step 2: Product class
+    static class Computer {
+        // Required attributes
+        private String cpu;
+        private String ram;
+
+        // Optional attributes
+        private String storage;
+        private String graphicsCard;
+        private String operatingSystem;
+
+        // Step 4: Private constructor to be used by the Builder
+        private Computer(Builder builder) {
+            this.cpu = builder.cpu;
+            this.ram = builder.ram;
+            this.storage = builder.storage;
+            this.graphicsCard = builder.graphicsCard;
+            this.operatingSystem = builder.operatingSystem;
+        }
+
+        // Step 3: Static nested Builder class
+        public static class Builder {
+            private String cpu;
+            private String ram;
+            private String storage;
+            private String graphicsCard;
+            private String operatingSystem;
+
+            // Constructor with required parameters
+            public Builder(String cpu, String ram) {
+                this.cpu = cpu;
+                this.ram = ram;
+            }
+
+            // Optional setters
+            public Builder setStorage(String storage) {
+                this.storage = storage;
+                return this;
+            }
+
+            public Builder setGraphicsCard(String graphicsCard) {
+                this.graphicsCard = graphicsCard;
+                return this;
+            }
+
+            public Builder setOperatingSystem(String os) {
+                this.operatingSystem = os;
+                return this;
+            }
+
+            // Build method returns a new Computer
+            public Computer build() {
+                return new Computer(this);
+            }
+        }
+
+        // Method to display configuration
+        public void showConfig() {
+            System.out.println("Computer Configuration:");
+            System.out.println("CPU: " + cpu);
+            System.out.println("RAM: " + ram);
+            System.out.println("Storage: " + (storage != null ? storage : "Not included"));
+            System.out.println("Graphics Card: " + (graphicsCard != null ? graphicsCard : "Not included"));
+            System.out.println("Operating System: " + (operatingSystem != null ? operatingSystem : "Not included"));
+            System.out.println("-----------------------------------");
+        }
+    }
+
+    // Step 5: Test the Builder Pattern
+    public static void main(String[] args) {
+        // Basic computer with required parts
+        Computer basicComputer = new Computer.Builder("Intel i5", "8GB").build();
+        basicComputer.showConfig();
+
+        // Gaming computer with all optional parts
+        Computer gamingComputer = new Computer.Builder("AMD Ryzen 9", "32GB")
+                .setStorage("1TB SSD")
+                .setGraphicsCard("NVIDIA RTX 4090")
+                .setOperatingSystem("Windows 11 Pro")
+                .build();
+        gamingComputer.showConfig();
+
+        // Office computer with some optional parts
+        Computer officeComputer = new Computer.Builder("Intel i7", "16GB")
+                .setStorage("512GB SSD")
+                .setOperatingSystem("Windows 10")
+                .build();
+        officeComputer.showConfig();
+    }
+}
+
+Output :
+Computer Configuration:
+CPU: Intel i5
+RAM: 8GB
+Storage: Not included
+Graphics Card: Not included
+Operating System: Not included
+-----------------------------------
+Computer Configuration:
+CPU: AMD Ryzen 9
+RAM: 32GB
+Storage: 1TB SSD
+Graphics Card: NVIDIA RTX 4090
+Operating System: Windows 11 Pro
+-----------------------------------
+Computer Configuration:
+CPU: Intel i7
+RAM: 16GB
+Storage: 512GB SSD
+Graphics Card: Not included
+Operating System: Windows 10
+-----------------------------------
+
