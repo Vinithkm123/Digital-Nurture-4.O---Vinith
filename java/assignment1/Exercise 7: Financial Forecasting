@@ -1,0 +1,60 @@
+## Exercise 7: Financial Forecasting
+
+import java.util.HashMap;
+import java.util.Map;
+
+// FinancialForecast class for future value prediction
+public class FinancialForecast {
+
+    // Recursive method without optimization
+    public static double futureValue(double presentValue, double rate, int years) {
+        if (years == 0) {
+            return presentValue;
+        }
+        return (1 + rate) * futureValue(presentValue, rate, years - 1);
+    }
+
+    // Recursive method with memoization (optimized)
+    private static Map<Integer, Double> memo = new HashMap<>();
+
+    public static double futureValueMemo(double presentValue, double rate, int years) {
+        if (years == 0) {
+            return presentValue;
+        }
+        if (memo.containsKey(years)) {
+            return memo.get(years);
+        }
+
+        double result = (1 + rate) * futureValueMemo(presentValue, rate, years - 1);
+        memo.put(years, result);
+        return result;
+    }
+
+    public static void main(String[] args) {
+        // Inputs
+        double presentValue = 10000.0; // ₹10,000 initial investment
+        double rate = 0.08;            // 8% growth rate
+        int years = 5;
+
+        System.out.println("=== Financial Forecasting ===");
+        System.out.println("Initial Amount: ₹" + presentValue);
+        System.out.println("Growth Rate: " + (rate * 100) + "%");
+        System.out.println("Years: " + years);
+
+        // Recursive method
+        double futureRecursive = futureValue(presentValue, rate, years);
+        System.out.printf("\n📈 Future Value (Recursive): ₹%.2f\n", futureRecursive);
+
+        // Memoized method
+        double futureMemo = futureValueMemo(presentValue, rate, years);
+        System.out.printf("💡 Future Value (Memoized): ₹%.2f\n", futureMemo);
+    }
+}
+Output:
+=== Financial Forecasting ===
+Initial Amount: ?10000.0
+Growth Rate: 8.0%
+Years: 5
+
+? Future Value (Recursive): ?14693.28
+? Future Value (Memoized): ?14693.28
