@@ -99,7 +99,7 @@ public class Main {
     }
 }
 
-Output:
+Output :
 === Bubble Sort by Total Price ===
 Order ID: 202, Customer: Bob, Total Price: ?750.5
 Order ID: 205, Customer: Eva, Total Price: ?999.99
