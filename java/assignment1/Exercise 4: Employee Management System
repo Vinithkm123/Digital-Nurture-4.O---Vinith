@@ -113,7 +113,7 @@ public class Main {
     }
 }
 
-output:
+Output :
 Employee added: Alice
 Employee added: Bob
 Employee added: Charlie
