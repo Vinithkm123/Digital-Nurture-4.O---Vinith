@@ -1,0 +1,50 @@
+## Exercise 1: Implementing the Singleton Pattern
+public class SingletonPatternExample {
+
+    // Singleton Logger class
+    static class Logger {
+        // Private static instance of Logger
+        private static Logger instance;
+
+        // Private constructor to prevent external instantiation
+        private Logger() {
+            System.out.println("Logger initialized.");
+        }
+
+        // Public method to provide access to the instance
+        public static Logger getInstance() {
+            if (instance == null) {
+                instance = new Logger(); // Lazy initialization
+            }
+            return instance;
+        }
+
+        // Log method
+        public void log(String message) {
+            System.out.println("LOG: " + message);
+        }
+    }
+
+    // Main method to test the singleton
+    public static void main(String[] args) {
+        // Get two instances of Logger
+        Logger logger1 = Logger.getInstance();
+        Logger logger2 = Logger.getInstance();
+
+        // Use the log method
+        logger1.log("This is the first log message.");
+        logger2.log("This is the second log message.");
+
+        // Check if both instances are the same
+        if (logger1 == logger2) {
+            System.out.println("Both logger1 and logger2 are the same instance.");
+        } else {
+            System.out.println("Different instances exist!");
+        }
+    }
+}
+Output :
+Logger initialized.
+LOG: This is the first log message.
+LOG: This is the second log message.
+Both logger1 and logger2 are the same instance.
