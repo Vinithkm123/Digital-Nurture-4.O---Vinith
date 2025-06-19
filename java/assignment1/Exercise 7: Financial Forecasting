@@ -50,7 +50,7 @@ public class FinancialForecast {
         System.out.printf("💡 Future Value (Memoized): ₹%.2f\n", futureMemo);
     }
 }
-Output:
+Output :
 === Financial Forecasting ===
 Initial Amount: ?10000.0
 Growth Rate: 8.0%
