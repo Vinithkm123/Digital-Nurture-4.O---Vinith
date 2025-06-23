@@ -26,4 +26,4 @@ public class CalculatorTest {
         assertEquals(1, calc.subtract(3, 2));
     }
 }
-
+ 
