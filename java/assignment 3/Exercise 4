@@ -1,0 +1,204 @@
+## Spring Testing Exercises 
+
+Exercise 1: Basic Unit Test for a Service Method
+Service
+java
+Copy
+Edit
+@Service
+public class CalculatorService {
+    public int add(int a, int b) {
+        return a + b;
+    }
+}
+Test
+java
+Copy
+Edit
+@SpringBootTest
+public class CalculatorServiceTest {
+
+    @Autowired
+    private CalculatorService calculatorService;
+
+    @Test
+    public void testAdd() {
+        assertEquals(5, calculatorService.add(2, 3));
+    }
+}
+Exercise 2: Mocking a Repository in a Service Test
+Entity, Repository, Service (as provided)
+Test
+java
+Copy
+Edit
+@ExtendWith(MockitoExtension.class)
+public class UserServiceTest {
+
+    @Mock
+    private UserRepository userRepository;
+
+    @InjectMocks
+    private UserService userService;
+
+    @Test
+    public void testGetUserById() {
+        User user = new User();
+        user.setId(1L);
+        user.setName("Vinith");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        User result = userService.getUserById(1L);
+        assertNotNull(result);
+        assertEquals("Vinith", result.getName());
+    }
+}
+Exercise 3: Testing a REST Controller with MockMvc
+Test
+java
+Copy
+Edit
+@WebMvcTest(UserController.class)
+public class UserControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private UserService userService;
+
+    @Test
+    public void testGetUser() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        user.setName("Vinith");
+
+        when(userService.getUserById(1L)).thenReturn(user);
+
+        mockMvc.perform(get("/users/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name").value("Vinith"));
+    }
+}
+Exercise 4: Integration Test with Spring Boot
+Test
+java
+Copy
+Edit
+@SpringBootTest
+@AutoConfigureMockMvc
+public class UserIntegrationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @BeforeEach
+    public void setup() {
+        userRepository.deleteAll();
+        User user = new User();
+        user.setId(1L);
+        user.setName("Vinith");
+        userRepository.save(user);
+    }
+
+    @Test
+    public void testUserFlow() throws Exception {
+        mockMvc.perform(get("/users/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name").value("Vinith"));
+    }
+}
+Exercise 5: Test Controller POST Endpoint
+Test
+java
+Copy
+Edit
+@Test
+public void testCreateUser() throws Exception {
+    User user = new User();
+    user.setId(1L);
+    user.setName("Vinith");
+
+    when(userService.saveUser(any(User.class))).thenReturn(user);
+
+    mockMvc.perform(post("/users")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"id\":1,\"name\":\"Vinith\"}"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.name").value("Vinith"));
+}
+Exercise 6: Test Service Exception Handling
+Test
+java
+Copy
+Edit
+@Test
+public void testUserNotFound() {
+    when(userRepository.findById(99L)).thenReturn(Optional.empty());
+    User result = userService.getUserById(99L);
+    assertNull(result);
+}
+Or if your service throws exception:
+
+java
+Copy
+Edit
+@Test
+public void testUserNotFoundThrows() {
+    when(userRepository.findById(99L)).thenThrow(new NoSuchElementException());
+    assertThrows(NoSuchElementException.class, () -> userService.getUserById(99L));
+}
+Exercise 7: Test Custom Repository Query
+Test
+java
+Copy
+Edit
+@Test
+public void testFindByName() {
+    User user = new User();
+    user.setId(1L);
+    user.setName("Vinith");
+
+    when(userRepository.findByName("Vinith")).thenReturn(List.of(user));
+
+    List<User> users = userRepository.findByName("Vinith");
+    assertFalse(users.isEmpty());
+    assertEquals("Vinith", users.get(0).getName());
+}
+Exercise 8: Test Controller Exception Handling
+Exception Handler
+java
+Copy
+Edit
+@ControllerAdvice
+public class GlobalExceptionHandler {
+    @ExceptionHandler(NoSuchElementException.class)
+    public ResponseEntity<String> handleNotFound(NoSuchElementException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+    }
+}
+Test
+java
+Copy
+Edit
+@Test
+public void testGlobalExceptionHandler() throws Exception {
+    when(userService.getUserById(1L)).thenThrow(new NoSuchElementException());
+
+    mockMvc.perform(get("/users/1"))
+        .andExpect(status().isNotFound())
+        .andExpect(content().string("User not found"));
+}
+Exercise 9: Parameterized Test with JUnit
+java
+Copy
+Edit
+@ParameterizedTest
+@ValueSource(ints = {1, 2, 3, 5})
+public void testIsEven(int number) {
+    assertTrue(number % 1 == 0);
+}
