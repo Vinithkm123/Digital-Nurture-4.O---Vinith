@@ -1,0 +1,110 @@
+## Mocking Dependencies in Spring Tests 
+
+Exercise 1: Mocking a Service Dependency in a Controller Test
+UserControllerTest.java
+java
+Copy
+Edit
+@WebMvcTest(UserController.class)
+public class UserControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private UserService userService;
+
+    @Test
+    public void testGetUser() throws Exception {
+        User user = new User();
+        user.setId(1L);
+        user.setName("Vinith");
+
+        when(userService.getUserById(1L)).thenReturn(user);
+
+        mockMvc.perform(get("/users/1"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.id").value(1))
+            .andExpect(jsonPath("$.name").value("Vinith"));
+    }
+}
+What’s happening:
+
+@WebMvcTest focuses only on UserController.
+
+@MockBean injects a mock of UserService.
+
+MockMvc simulates HTTP requests to test the controller layer only.
+
+Exercise 2: Mocking a Repository in a Service Test
+UserServiceTest.java
+java
+Copy
+Edit
+@ExtendWith(MockitoExtension.class)
+public class UserServiceTest {
+
+    @Mock
+    private UserRepository userRepository;
+
+    @InjectMocks
+    private UserService userService;
+
+    @Test
+    public void testGetUserById() {
+        User user = new User();
+        user.setId(2L);
+        user.setName("John");
+
+        when(userRepository.findById(2L)).thenReturn(Optional.of(user));
+
+        User result = userService.getUserById(2L);
+
+        assertNotNull(result);
+        assertEquals("John", result.getName());
+    }
+}
+What’s happening:
+
+@Mock mocks the UserRepository.
+
+@InjectMocks injects it into the UserService.
+
+This unit test checks UserService logic independent of the database or Spring context.
+
+Exercise 3: Mocking a Service Dependency in an Integration Test
+UserIntegrationTest.java
+java
+Copy
+Edit
+@SpringBootTest
+@AutoConfigureMockMvc
+public class UserIntegrationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private UserService userService;
+
+    @Test
+    public void testUserEndpointWithMockedService() throws Exception {
+        User user = new User();
+        user.setId(3L);
+        user.setName("Alice");
+
+        when(userService.getUserById(3L)).thenReturn(user);
+
+        mockMvc.perform(get("/users/3"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$.name").value("Alice"));
+    }
+}
+What’s happening:
+
+@SpringBootTest loads the full application context.
+
+@MockBean replaces the real UserService with a mock within the full context.
+
+Useful for testing controller plus filters, configs, exception handlers, etc. without hitting real services.
+
