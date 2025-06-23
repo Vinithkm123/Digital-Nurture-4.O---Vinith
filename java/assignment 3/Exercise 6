@@ -1,0 +1,101 @@
+## Logging using SLF4J 
+
+Exercise 1: Logging Error Messages and Warning Levels
+pom.xml (add dependencies)
+xml
+Copy
+Edit
+<dependencies>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.30</version>
+    </dependency>
+    <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.2.3</version>
+    </dependency>
+</dependencies>
+LoggingExample.java
+java
+Copy
+Edit
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class LoggingExample {
+    private static final Logger logger = LoggerFactory.getLogger(LoggingExample.class);
+
+    public static void main(String[] args) {
+        logger.error("This is an error message");
+        logger.warn("This is a warning message");
+    }
+}
+Exercise 2: Parameterized Logging
+ParameterizedLoggingExample.java
+java
+Copy
+Edit
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class ParameterizedLoggingExample {
+    private static final Logger logger = LoggerFactory.getLogger(ParameterizedLoggingExample.class);
+
+    public static void main(String[] args) {
+        String user = "Vinith";
+        int age = 22;
+
+        logger.info("User {} has logged in.", user);
+        logger.debug("User {} is {} years old.", user, age);
+    }
+}
+SLF4J automatically handles placeholder {} replacement efficiently without string concatenation.
+
+Exercise 3: Using Different Appenders
+logback.xml (put this in src/main/resources)
+xml
+Copy
+Edit
+<configuration>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="file" class="ch.qos.logback.core.FileAppender">
+        <file>logs/app.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <root level="debug">
+        <appender-ref ref="console"/>
+        <appender-ref ref="file"/>
+    </root>
+
+</configuration>
+Folder structure for logs
+Make sure logs/ folder exists in your project directory, or Logback will create it on the first run.
+
+AppenderLoggingExample.java
+java
+Copy
+Edit
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class AppenderLoggingExample {
+    private static final Logger logger = LoggerFactory.getLogger(AppenderLoggingExample.class);
+
+    public static void main(String[] args) {
+        logger.info("This message will go to console and file.");
+        logger.debug("Debug level message.");
+        logger.warn("Warning level message.");
+    }
+}
