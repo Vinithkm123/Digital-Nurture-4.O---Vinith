@@ -1,0 +1,220 @@
+## Advanced Mockito Hands-On – Summary with Code and Explanation
+Exercise 1: Mocking Databases and Repositories
+Theory
+Instead of using a real database, mock the Repository interface.
+
+Stub getData() to return test data.
+
+Test the logic inside Service.
+
+Class Definitions
+java
+Copy
+Edit
+interface Repository {
+    String getData();
+}
+
+class Service {
+    private Repository repository;
+
+    public Service(Repository repository) {
+        this.repository = repository;
+    }
+
+    public String processData() {
+        return "Processed " + repository.getData();
+    }
+}
+Test Code
+java
+Copy
+Edit
+import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class ServiceTest {
+    @Test
+    public void testServiceWithMockRepository() {
+        Repository mockRepository = mock(Repository.class);
+        when(mockRepository.getData()).thenReturn("Mock Data");
+
+        Service service = new Service(mockRepository);
+        String result = service.processData();
+
+        assertEquals("Processed Mock Data", result);
+    }
+}
+Exercise 2: Mocking External Services (REST APIs)
+Theory
+Use a mock REST client instead of making real API calls.
+
+Stub getResponse() with fake API output.
+Class Definitions
+java
+Copy
+Edit
+interface RestClient {
+    String getResponse();
+}
+
+class ApiService {
+    private RestClient client;
+
+    public ApiService(RestClient client) {
+        this.client = client;
+    }
+
+    public String fetchData() {
+        return "Fetched " + client.getResponse();
+    }
+}
+Test Code
+java
+Copy
+Edit
+public class ApiServiceTest {
+    @Test
+    public void testServiceWithMockRestClient() {
+        RestClient mockRestClient = mock(RestClient.class);
+        when(mockRestClient.getResponse()).thenReturn("Mock Response");
+
+        ApiService apiService = new ApiService(mockRestClient);
+        String result = apiService.fetchData();
+
+        assertEquals("Fetched Mock Response", result);
+    }
+}
+Exercise 3: Mocking File I/O
+Theory
+Simulate reading/writing files by mocking reader and writer classes.
+
+Class Definitions
+java
+Copy
+Edit
+interface FileReader {
+    String read();
+}
+
+interface FileWriter {
+    void write(String data);
+}
+
+class FileService {
+    private FileReader reader;
+    private FileWriter writer;
+
+    public FileService(FileReader reader, FileWriter writer) {
+        this.reader = reader;
+        this.writer = writer;
+    }
+
+    public String processFile() {
+        String data = reader.read();
+        writer.write("Processed " + data);
+        return "Processed " + data;
+    }
+}
+Test Code
+java
+Copy
+Edit
+public class FileServiceTest {
+    @Test
+    public void testServiceWithMockFileIO() {
+        FileReader mockReader = mock(FileReader.class);
+        FileWriter mockWriter = mock(FileWriter.class);
+
+        when(mockReader.read()).thenReturn("Mock File Content");
+
+        FileService service = new FileService(mockReader, mockWriter);
+        String result = service.processFile();
+
+        assertEquals("Processed Mock File Content", result);
+        verify(mockWriter).write("Processed Mock File Content");
+    }
+}
+Exercise 4: Mocking Network Interactions
+Theory
+Simulate network calls (like connect() to a server).
+
+Class Definitions
+java
+Copy
+Edit
+interface NetworkClient {
+    String connect();
+}
+
+class NetworkService {
+    private NetworkClient client;
+
+    public NetworkService(NetworkClient client) {
+        this.client = client;
+    }
+
+    public String connectToServer() {
+        return "Connected to " + client.connect();
+    }
+}
+Test Code
+java
+Copy
+Edit
+public class NetworkServiceTest {
+    @Test
+    public void testServiceWithMockNetworkClient() {
+        NetworkClient mockClient = mock(NetworkClient.class);
+        when(mockClient.connect()).thenReturn("Mock Connection");
+
+        NetworkService service = new NetworkService(mockClient);
+        String result = service.connectToServer();
+
+        assertEquals("Connected to Mock Connection", result);
+    }
+}
+Exercise 5: Multiple Return Values
+theory
+When calling a method multiple times, stub it to return different outputs.
+
+Class Definitions
+java
+Copy
+Edit
+interface Repository {
+    String getData();
+}
+
+class Service {
+    private Repository repository;
+
+    public Service(Repository repository) {
+        this.repository = repository;
+    }
+
+    public String processData() {
+        return "Processed " + repository.getData();
+    }
+}
+Test Code
+java
+Copy
+Edit
+public class MultiReturnServiceTest {
+    @Test
+    public void testServiceWithMultipleReturnValues() {
+        Repository mockRepository = mock(Repository.class);
+        when(mockRepository.getData())
+            .thenReturn("First Mock Data")
+            .thenReturn("Second Mock Data");
+
+        Service service = new Service(mockRepository);
+        String firstResult = service.processData();
+        String secondResult = service.processData();
+
+        assertEquals("Processed First Mock Data", firstResult);
+        assertEquals("Processed Second Mock Data", secondResult);
+    }
+}
