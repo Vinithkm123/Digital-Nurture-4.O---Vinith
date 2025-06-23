@@ -1,0 +1,164 @@
+## Exercise 4
+
+What is a Merge Conflict?
+A merge conflict happens when:
+
+Two branches have changed the same part of a file, and Git doesn't know which version to keep.
+
+Example:
+You change line 3 in hello.xml in GitWork branch.
+
+Someone else changes the same line in master.
+
+When you merge GitWork into master — conflict! 
+
+🔧 Hands-On Lab: Conflict Resolution
+1. Verify master is in a clean state
+bash
+Copy
+Edit
+git checkout master
+git status
+Expected: nothing to commit, working tree clean
+
+2. Create a new branch and add hello.xml
+bash
+Copy
+Edit
+git checkout -b GitWork
+echo "<message>Hello from GitWork</message>" > hello.xml
+3. Update hello.xml
+bash
+Copy
+Edit
+echo "<note>This is updated by GitWork branch</note>" >> hello.xml
+git status
+You should see hello.xml as modified.
+
+4. Commit the changes
+bash
+Copy
+Edit
+git add hello.xml
+git commit -m "GitWork branch: Added and updated hello.xml"
+5. Switch to master
+bash
+Copy
+Edit
+git checkout master
+6. Add a different hello.xml in master
+bash
+Copy
+Edit
+echo "<message>Hello from master</message>" > hello.xml
+echo "<note>This is updated by master branch</note>" >> hello.xml
+7. Commit changes in master
+bash
+Copy
+Edit
+git add hello.xml
+git commit -m "Master branch: Created hello.xml with different content"
+8. View all commit history
+bash
+Copy
+Edit
+git log --oneline --graph --decorate --all
+You’ll see two different commits from GitWork and master.
+
+9. Check text differences between branches
+bash
+Copy
+Edit
+git diff master GitWork
+10. Use P4Merge for visual diff
+Setup once (if not done yet):
+
+bash
+Copy
+Edit
+git config --global diff.tool p4merge
+git config --global merge.tool p4merge
+git config --global mergetool.p4merge.cmd "\"C:/Program Files/Perforce/p4merge.exe\" \"$BASE\" \"$LOCAL\" \"$REMOTE\" \"$MERGED\""
+Then run:
+
+bash
+Copy
+Edit
+git difftool master GitWork
+P4Merge opens — shows side-by-side difference in hello.xml
+
+11. Merge the branch into master
+bash
+Copy
+Edit
+git merge GitWork
+Expected: Merge conflict detected!
+Git output:
+
+pgsql
+Copy
+Edit
+Auto-merging hello.xml
+CONFLICT (content): Merge conflict in hello.xml
+Automatic merge failed; fix conflicts and then commit the result.
+12. Open hello.xml → Git Markup
+It will look like:
+
+xml
+Copy
+Edit
+<<<<<<< HEAD
+<message>Hello from master</message>
+<note>This is updated by master branch</note>
+=======
+<message>Hello from GitWork</message>
+<note>This is updated by GitWork branch</note>
+>>>>>>> GitWork
+13. Resolve the conflict using 3-way merge tool (P4Merge)
+bash
+Copy
+Edit
+git mergetool
+P4Merge opens. Choose how you want to merge both changes.
+
+✔ Save the merged version in P4Merge
+
+14. Commit the resolved conflict
+bash
+Copy
+Edit
+git add hello.xml
+git commit -m "Resolved merge conflict in hello.xml"
+15. Ignore backup files (e.g., .orig created by mergetool)
+bash
+Copy
+Edit
+echo "*.orig" >> .gitignore
+16. Commit .gitignore
+bash
+Copy
+Edit
+git add .gitignore
+git commit -m "Ignore merge backup files"
+17. List all branches
+bash
+Copy
+Edit
+git branch
+Output:
+
+markdown
+Copy
+Edit
+* master
+  GitWork
+18. Delete the merged branch
+bash
+Copy
+Edit
+git branch -d GitWork
+19. View final log
+bash
+Copy
+Edit
+git log --oneline --graph --decorate
