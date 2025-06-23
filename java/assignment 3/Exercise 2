@@ -1,0 +1,158 @@
+## Advanced JUnit Testing Exercises
+Exercise 1: Parameterized Tests
+Theory:
+Test same logic with different inputs using @ParameterizedTest + @ValueSource.
+
+EvenChecker.java
+java
+Copy
+Edit
+public class EvenChecker {
+    public boolean isEven(int number) {
+        return number % 2 == 0;
+    }
+}
+EvenCheckerTest.java
+java
+Copy
+Edit
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class EvenCheckerTest {
+
+    EvenChecker checker = new EvenChecker();
+
+    @ParameterizedTest
+    @ValueSource(ints = {2, 4, 6, 8, 10})
+    void testEvenNumbers(int input) {
+        assertTrue(checker.isEven(input));
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {1, 3, 5, 7, 9})
+    void testOddNumbers(int input) {
+        assertFalse(checker.isEven(input));
+    }
+}
+Exercise 2: Test Suites and Categories
+Theory:
+Group multiple test classes into a suite using @Suite and @SelectClasses.
+AllTests.java
+java
+Copy
+Edit
+import org.junit.platform.suite.api.SelectClasses;
+import org.junit.platform.suite.api.Suite;
+
+@Suite
+@SelectClasses({
+    EvenCheckerTest.class,
+    OrderedTests.class,
+    ExceptionThrowerTest.class
+})
+public class AllTests {
+}
+Run this as a suite to run all tests inside selected classes.
+
+Exercise 3: Test Execution Order
+Theory:
+Control order using @TestMethodOrder and @Order.
+
+OrderedTests.java
+java
+Copy
+Edit
+import org.junit.jupiter.api.*;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+public class OrderedTests {
+
+    @Test
+    @Order(2)
+    void testSecond() {
+        System.out.println("Second test");
+        assertTrue(true);
+    }
+
+    @Test
+    @Order(1)
+    void testFirst() {
+        System.out.println("First test");
+        assertTrue(true);
+    }
+
+    @Test
+    @Order(3)
+    void testThird() {
+        System.out.println("Third test");
+        assertTrue(true);
+    }
+}
+Exercise 4: Exception Testing
+Theory:
+Use assertThrows() to check if a method throws expected exception.
+
+ExceptionThrower.java
+java
+Copy
+Edit
+public class ExceptionThrower {
+    public void throwException() {
+        throw new IllegalArgumentException("Invalid input");
+    }
+}
+ExceptionThrowerTest.java
+java
+Copy
+Edit
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class ExceptionThrowerTest {
+
+    @Test
+    void testThrowException() {
+        ExceptionThrower et = new ExceptionThrower();
+        assertThrows(IllegalArgumentException.class, et::throwException);
+    }
+}
+Exercise 5: Timeout and Performance Testing
+Theory:
+Use @Timeout to enforce time limits on tests.
+
+PerformanceTester.java
+java
+Copy
+Edit
+public class PerformanceTester {
+    public void performTask() throws InterruptedException {
+        // Simulate some delay (e.g., network call)
+        Thread.sleep(300);
+    }
+}
+PerformanceTesterTest.java
+java
+Copy
+Edit
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public class PerformanceTesterTest {
+
+    @Test
+    @Timeout(value = 1, unit = TimeUnit.SECONDS)
+    void testPerformTaskWithinTime() throws InterruptedException {
+        PerformanceTester tester = new PerformanceTester();
+        tester.performTask();
+        assertTrue(true);
+    }
+}
