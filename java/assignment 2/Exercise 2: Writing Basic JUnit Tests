@@ -22,7 +22,7 @@ public class CalculatorTest {
 
     @Test
     public void testSubtract() {
-        Calculator calc = new Calculator();
+        Calculator calc = new Calculator(); 
         assertEquals(1, calc.subtract(3, 2));
     }
 }
