@@ -1,0 +1,83 @@
+## Exercise 2
+
+What is gitignore?
+.gitignore is a special file that tells Git:
+
+"Hey Git! Please ignore these files/folders. I don’t want them in my repository."
+
+✅ Why do we use .gitignore?
+To avoid committing:
+
+Temporary files (*.log, *.class)
+
+Personal config files (.env)
+
+Output folders like log/, build/
+
+🛠️ How to Use .gitignore (Hands-On Lab Steps)
+✅ Step 1: Setup Git and Notepad++ as Default Editor
+(If already done, skip this)
+
+Set Notepad++ as default Git editor:
+bash
+Copy
+Edit
+git config --global core.editor "'C:/Program Files/Notepad++/notepad++.exe' -multiInst -nosession"
+Replace the path with where your Notepad++ is installed.
+
+✅ Step 2: Initialize a Git Repository
+Open Git Bash.
+
+Navigate to your project folder:
+
+bash
+Copy
+Edit
+cd path/to/your/project
+Initialize Git:
+
+bash
+Copy
+Edit
+git init
+✅ Step 3: Create .log File and log/ Folder
+bash
+Copy
+Edit
+echo "This is a test log" > error.log
+mkdir log
+echo "Log inside folder" > log/test.log
+✅ Step 4: Create .gitignore File
+Create the file:
+
+bash
+Copy
+Edit
+notepad++ .gitignore
+Add these lines:
+
+bash
+Copy
+Edit
+*.log
+log/
+This tells Git:
+
+Ignore all files ending with .log
+
+Ignore the entire log folder
+
+✅ Step 5: Check Git Status
+bash
+Copy
+Edit
+git status
+You will not see error.log or anything inside log/ — that means Git is ignoring them correctly ✅
+
+✅ Step 6: Add Other Files and Commit
+bash
+Copy
+Edit
+echo "Hello Java" > hello.java
+git add .
+git commit -m "First commit ignoring log files"
