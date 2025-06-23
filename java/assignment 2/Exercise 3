@@ -1,0 +1,182 @@
+## Exercise 3
+What is Branching in Git?
+Branching is like creating a separate copy of your code to work on a new feature or fix bugs without affecting the main project.
+
+The main branch is usually called master or main.
+
+You can create new branches like GitNewBranch, work on them, and then merge them back into master.
+
+Making a copy of your notebook page to try a new solution, without erasing the original answer.
+
+ Why Use Branches?
+Team members can work independently.
+
+Prevent breaking the main code.
+
+Easy to test features before going live.
+
+What is Merging in Git?
+
+Merging means combining your branch (e.g., GitNewBranch) back into the main branch (e.g., master).
+
+Git tries to automatically combine changes.
+
+If Git finds conflicting changes, you’ll be asked to resolve them.
+
+Example:
+
+If you and your friend worked on the same document in two copies, merging is putting both changes into one final version.
+
+What is a Branch Request in GitLab?
+In GitLab, you create a branch on the remote repository to start working on a new feature.
+
+You can do it from:
+
+GitLab UI → Repository > Branches → Create new branch
+
+Or by pushing your local branch:
+
+bash
+Copy
+Edit
+git push origin GitNewBranch
+What is a Merge Request in GitLab?
+A Merge Request (MR) is a formal request to merge your branch into another (e.g., merge GitNewBranch into master).
+
+In Merge Requests, reviewers can:
+
+See the diff (changes)
+
+Comment
+
+Approve or reject
+
+Merge the code
+
+This is how teams collaborate on shared projects.
+
+🛠️ P4Merge Tool in Git
+P4Merge is a visual tool that helps you:
+
+See changes between two versions
+
+Compare side-by-side
+
+Resolve conflicts
+
+We use:
+
+bash
+Copy
+Edit
+git difftool master GitNewBranch
+To visually check differences between branches
+
+Part 1: Branching
+1. Create a new branch
+bash
+Copy
+Edit
+git checkout -b GitNewBranch
+This creates and switches to the new branch.
+
+2. List all local and remote branches
+bash
+Copy
+Edit
+git branch -a
+Output:
+
+markdown
+Copy
+Edit
+* GitNewBranch
+  master
+* means you're currently on GitNewBranch
+
+3. Add files in the new branch
+bash
+Copy
+Edit
+echo "This is a new feature" > feature.txt
+mkdir newDir
+echo "New directory content" > newDir/info.txt
+4. Commit the changes
+bash
+Copy
+Edit
+git add .
+git commit -m "Added feature.txt and newDir/info.txt in GitNewBranch"
+5. Check status
+bash
+Copy
+Edit
+git status
+Output:
+
+pgsql
+Copy
+Edit
+On branch GitNewBranch
+nothing to commit, working tree clean
+Part 2: Merging
+1. Switch to master branch
+bash
+Copy
+Edit
+git checkout master
+2. Show CLI difference between master and GitNewBranch
+bash
+Copy
+Edit
+git diff master..GitNewBranch
+3. Show visual difference using P4Merge
+First time setup:
+bash
+Copy
+Edit
+git config --global diff.tool p4merge
+git config --global merge.tool p4merge
+git config --global mergetool.p4merge.cmd "\"C:/Program Files/Perforce/p4merge.exe\" \"$BASE\" \"$LOCAL\" \"$REMOTE\" \"$MERGED\""
+Run visual diff:
+bash
+Copy
+Edit
+git difftool master GitNewBranch
+P4Merge will open showing the difference.
+
+4. Merge the branch into master
+bash
+Copy
+Edit
+git merge GitNewBranch
+5. View merged history in graph
+bash
+Copy
+Edit
+git log --oneline --graph --decorate
+Example output:
+
+markdown
+Copy
+Edit
+* 2c8f9cd (HEAD -> master) Added feature.txt and newDir/info.txt in GitNewBranch
+* 4e7ab6b Initial commit
+6. Delete the branch
+bash
+Copy
+Edit
+git branch -d GitNewBranch
+Check:
+
+bash
+Copy
+Edit
+git status
+Output:
+
+pgsql
+Copy
+Edit
+On branch master
+nothing to commit, working tree clean
