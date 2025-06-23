@@ -1,0 +1,152 @@
+## JUnit Testing Exercises 
+Exercise 1: Setting Up JUnit in Java Project
+Maven Setup (pom.xml):
+Add this to your <dependencies> section:
+
+xml
+Copy
+Edit
+<dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>4.13.2</version>
+    <scope>test</scope>
+</dependency>
+IDE Setup:
+Create a new Maven project in IntelliJ IDEA or Eclipse.
+
+Create src/main/java and src/test/java.
+
+Add a sample Java class in src/main/java.
+
+Add test class in src/test/java.
+
+Exercise 2: Writing Basic JUnit Tests
+Scenario:
+You want to test a basic calculator class.
+
+Java Code (Calculator.java)
+java
+Copy
+Edit
+public class Calculator {
+    public int add(int a, int b) {
+        return a + b;
+    }
+    
+    public int subtract(int a, int b) {
+        return a - b;
+    }
+}
+JUnit Test (CalculatorTest.java)
+java
+Copy
+Edit
+import static org.junit.Assert.*;
+import org.junit.Test;
+
+public class CalculatorTest {
+
+    @Test
+    public void testAdd() {
+        Calculator calc = new Calculator();
+        assertEquals(10, calc.add(6, 4));
+    }
+
+    @Test
+    public void testSubtract() {
+        Calculator calc = new Calculator();
+        assertEquals(2, calc.subtract(5, 3));
+    }
+}
+Exercise 3: Assertions in JUnit
+Theory:
+JUnit provides assertions to verify test results:
+
+assertEquals()
+
+assertTrue(), assertFalse()
+
+assertNull(), assertNotNull()
+
+Code (AssertionsTest.java)
+java
+Copy
+Edit
+import static org.junit.Assert.*;
+import org.junit.Test;
+
+public class AssertionsTest {
+
+    @Test
+    public void testAssertions() {
+        // Assert equals
+        assertEquals(5, 2 + 3);
+
+        // Assert true
+        assertTrue(5 > 3);
+
+        // Assert false
+        assertFalse(5 < 3);
+
+        // Assert null
+        assertNull(null);
+
+        // Assert not null
+        assertNotNull(new Object());
+    }
+}
+Exercise 4: AAA Pattern + Setup/Teardown
+Theory:
+Arrange – Set up the environment
+
+Act – Call the method to test
+
+Assert – Verify the result
+
+Use @Before for setup, @After for cleanup
+
+Java Code (MathUtil.java)
+java
+Copy
+Edit
+public class MathUtil {
+    public int multiply(int a, int b) {
+        return a * b;
+    }
+}
+JUnit Test (MathUtilTest.java)
+java
+Copy
+Edit
+import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.After;
+import org.junit.Test;
+
+public class MathUtilTest {
+
+    private MathUtil mathUtil;
+
+    @Before
+    public void setUp() {
+        // Arrange
+        mathUtil = new MathUtil();
+        System.out.println("Setup complete");
+    }
+
+    @Test
+    public void testMultiply() {
+        // Act
+        int result = mathUtil.multiply(3, 4);
+
+        // Assert
+        assertEquals(12, result);
+    }
+
+    @After
+    public void tearDown() {
+        mathUtil = null;
+        System.out.println("Teardown complete");
+    }
+}
