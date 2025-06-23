@@ -1,0 +1,80 @@
+## Exercise 5
+
+What does this mean?
+After working locally on a Git project (like resolving merge conflicts or finishing features), we must:
+
+Make sure everything is clean
+
+Pull latest changes from the remote
+
+Push our work to the remote repository (GitHub/GitLab)
+
+🔧 Prerequisites
+You have a GitHub or GitLab repo cloned
+
+You completed the previous lab (e.g., Git-T03-HOL_002)
+
+Git remote is already set up
+
+🛠️ Step-by-Step Lab
+1. Verify if master is in a clean state
+bash
+Copy
+Edit
+git checkout master
+git status
+Expected Output:
+
+pgsql
+Copy
+Edit
+On branch master
+nothing to commit, working tree clean
+If not clean, first commit or stash your work.
+
+2. List all branches
+bash
+Copy
+Edit
+git branch
+This shows all local branches:
+
+markdown
+Copy
+Edit
+* master
+  GitWork
+  other-feature-branch
+Optional (to see remote branches too):
+
+bash
+Copy
+Edit
+git branch -a
+3. Pull latest changes from remote
+bash
+Copy
+Edit
+git pull origin master
+This makes sure your local master is up to date with the remote one.
+
+4. Push your changes (from previous lab) to remote
+You might have local commits from the last hands-on (e.g., conflict resolution, .gitignore, etc.)
+
+Push them:
+
+bash
+Copy
+Edit
+git push origin master
+5. Verify changes are reflected on remote
+Go to your GitHub or GitLab project URL in the browser.
+
+Check that:
+
+Latest commit message is visible
+
+New files like hello.xml or updated .gitignore are present
+
+Commit history matches your local repo
+
