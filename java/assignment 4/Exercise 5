@@ -1,0 +1,211 @@
+## 1. Account Microservice (account-service)
+pom.xml dependencies:
+xml
+Copy
+Edit
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+</dependency>
+application.properties
+properties
+Copy
+Edit
+spring.application.name=account-service
+server.port=8080
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+AccountController.java
+java
+Copy
+Edit
+@RestController
+@RequestMapping("/accounts")
+public class AccountController {
+
+    @GetMapping("/{number}")
+    public Map<String, Object> getAccount(@PathVariable String number) {
+        return Map.of(
+            "number", number,
+            "type", "savings",
+            "balance", 234343
+        );
+    }
+}
+AccountServiceApplication.java
+java
+Copy
+Edit
+@SpringBootApplication
+@EnableDiscoveryClient
+public class AccountServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(AccountServiceApplication.class, args);
+    }
+}
+
+2. Loan Microservice (loan-service)
+pom.xml – Same dependencies as above.
+application.properties
+properties
+Copy
+Edit
+spring.application.name=loan-service
+server.port=8081
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+LoanController.java
+java
+Copy
+Edit
+@RestController
+@RequestMapping("/loans")
+public class LoanController {
+
+    @GetMapping("/{number}")
+    public Map<String, Object> getLoan(@PathVariable String number) {
+        return Map.of(
+            "number", number,
+            "type", "car",
+            "loan", 400000,
+            "emi", 3258,
+            "tenure", 18
+        );
+    }
+}
+LoanServiceApplication.java
+java
+Copy
+Edit
+@SpringBootApplication
+@EnableDiscoveryClient
+public class LoanServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(LoanServiceApplication.class, args);
+    }
+}
+
+3. Eureka Discovery Server (eureka-discovery-server)
+pom.xml
+xml
+Copy
+Edit
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+</dependency>
+application.properties
+properties
+Copy
+Edit
+spring.application.name=eureka-discovery-server
+server.port=8761
+eureka.client.register-with-eureka=false
+eureka.client.fetch-registry=false
+logging.level.com.netflix.eureka=OFF
+logging.level.com.netflix.discovery=OFF
+EurekaDiscoveryServerApplication.java
+java
+Copy
+Edit
+@SpringBootApplication
+@EnableEurekaServer
+public class EurekaDiscoveryServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(EurekaDiscoveryServerApplication.class, args);
+    }
+}
+
+4. Greet Microservice (greet-service)
+pom.xml
+Same as account-service, plus:
+
+xml
+Copy
+Edit
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+application.properties
+properties
+Copy
+Edit
+spring.application.name=greet-service
+server.port=8082
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+GreetController.java
+java
+Copy
+Edit
+@RestController
+public class GreetController {
+
+    @GetMapping("/greet")
+    public String greet() {
+        return "Hello World";
+    }
+}
+GreetServiceApplication.java
+java
+Copy
+Edit
+@SpringBootApplication
+@EnableDiscoveryClient
+public class GreetServiceApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(GreetServiceApplication.class, args);
+    }
+}
+
+5. API Gateway (api-gateway)
+pom.xml
+xml
+Copy
+Edit
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-gateway</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+</dependency>
+application.properties
+properties
+Copy
+Edit
+spring.application.name=api-gateway
+server.port=9090
+eureka.client.service-url.defaultZone=http://localhost:8761/eureka/
+
+spring.cloud.gateway.discovery.locator.enabled=true
+spring.cloud.gateway.discovery.locator.lower-case-service-id=true
+ApiGatewayApplication.java
+java
+Copy
+Edit
+@SpringBootApplication
+@EnableDiscoveryClient
+public class ApiGatewayApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ApiGatewayApplication.class, args);
+    }
+}
+LogFilter.java (Global Filter)
+java
+Copy
+Edit
+@Component
+public class LogFilter implements GlobalFilter {
+
+    private static final Logger logger = LoggerFactory.getLogger(LogFilter.class);
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        logger.info("Incoming request: {}", exchange.getRequest().getURI());
+        return chain.filter(exchange);
+    }
+}
