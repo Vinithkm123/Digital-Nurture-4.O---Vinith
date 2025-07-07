@@ -1,50 +1,275 @@
-## Exercise 2: Load Balancing in API Gateway
+## Exercise 1: Centralized Authentication with OAuth 2.1 / OIDC
 
-pom.xml (Add Dependencies)
+pom.xml (Dependencies)
 xml
 Copy
 Edit
 <dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-gateway</artifactId>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
 </dependency>
 <dependency>
-    <groupId>org.springframework.cloud</groupId>
-    <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-oauth2-client</artifactId>
 </dependency>
-
-application.properties
-properties
+application.yml
+yaml
 Copy
 Edit
-spring.cloud.gateway.routes[0].id=load_balanced_route
-spring.cloud.gateway.routes[0].uri=lb://example-service
-spring.cloud.gateway.routes[0].predicates[0]=Path=/loadbalanced/**
-LoadBalancerConfiguration.java
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          my-client:
+            client-id: YOUR_CLIENT_ID
+            client-secret: YOUR_CLIENT_SECRET
+            scope: openid, profile, email
+            authorization-grant-type: authorization_code
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+        provider:
+          my-provider:
+            authorization-uri: https://accounts.google.com/o/oauth2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://openidconnect.googleapis.com/v1/userinfo
+            user-name-attribute: sub
+SecurityConfig.java
 java
 Copy
 Edit
-import org.springframework.cloud.client.ServiceInstance;
-import org.springframework.cloud.client.loadbalancer.LoadBalancerClientFactory;
-import org.springframework.cloud.client.loadbalancer.ReactorLoadBalancer;
-import org.springframework.cloud.loadbalancer.core.RandomLoadBalancer;
-import org.springframework.cloud.loadbalancer.core.ServiceInstanceListSupplier;
-import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+@EnableWebSecurity
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
+            .oauth2Login();
+    }
+}
+UserController.java
+java
+Copy
+Edit
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.security.Principal;
+
+@RestController
+public class UserController {
+    @GetMapping("/user")
+    public Principal user(Principal principal) {
+        return principal;
+    }
+}
+
+Exercise 2: Authorization Server and Resource Server
+pom.xml (Dependencies)
+xml
+Copy
+Edit
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+</dependency>
+application.yml
+yaml
+Copy
+Edit
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://issuer.example.com
+ResourceServerConfig.java
+java
+Copy
+Edit
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+
+@EnableWebSecurity
+public class ResourceServerConfig extends WebSecurityConfigurerAdapter {
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
+            .oauth2ResourceServer()
+                .jwt();
+    }
+}
+SecureController.java
+java
+Copy
+Edit
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class SecureController {
+    @GetMapping("/secure")
+    public String secure() {
+        return "This is a secure endpoint";
+    }
+}
+
+Exercise 3: JWT-Based Secure Communication
+pom.xml (Dependencies)
+xml
+Copy
+Edit
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+</dependency>
+<dependency>
+    <groupId>io.jsonwebtoken</groupId>
+    <artifactId>jjwt</artifactId>
+    <version>0.9.1</version>
+</dependency>
+application.yml
+yaml
+Copy
+Edit
+spring:
+  security:
+    jwt:
+      secret: YOUR_SECRET_KEY
+JwtConfig.java
+java
+Copy
+Edit
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 
 @Configuration
-public class LoadBalancerConfiguration {
+public class JwtConfig {
+    @Value("${spring.security.jwt.secret}")
+    private String secret;
 
-    @Bean
-    public ReactorLoadBalancer<ServiceInstance> randomLoadBalancer(
-            Environment environment,
-            LoadBalancerClientFactory loadBalancerClientFactory) {
+    public String getSecret() {
+        return secret;
+    }
+}
+JwtTokenProvider.java
+java
+Copy
+Edit
+import io.jsonwebtoken.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-        String name = environment.getProperty(LoadBalancerClientFactory.PROPERTY_NAME);
-        return new RandomLoadBalancer(
-                loadBalancerClientFactory.getLazyProvider(name, ServiceInstanceListSupplier.class),
-                name
-        );
+import java.util.Date;
+
+@Component
+public class JwtTokenProvider {
+
+    @Autowired
+    private JwtConfig jwtConfig;
+
+    public String createToken(String username) {
+        Claims claims = Jwts.claims().setSubject(username);
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + 3600000); // 1 hour
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .signWith(SignatureAlgorithm.HS256, jwtConfig.getSecret())
+                .compact();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parser().setSigningKey(jwtConfig.getSecret()).parseClaimsJws(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public String getUsername(String token) {
+        return Jwts.parser().setSigningKey(jwtConfig.getSecret())
+                .parseClaimsJws(token).getBody().getSubject();
+    }
+}
+JwtTokenFilter.java
+java
+Copy
+Edit
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import javax.servlet.*;
+import javax.servlet.http.*;
+import java.io.IOException;
+
+public class JwtTokenFilter extends OncePerRequestFilter {
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+            throws ServletException, IOException {
+
+        String token = resolveToken(request);
+        if (token != null && jwtTokenProvider.validateToken(token)) {
+            String username = jwtTokenProvider.getUsername(token);
+            Authentication auth = new UsernamePasswordAuthenticationToken(username, null, null);
+            SecurityContextHolder.getContext().setAuthentication(auth);
+        }
+
+        filterChain.doFilter(request, response);
+    }
+
+    private String resolveToken(HttpServletRequest request) {
+        String bearer = request.getHeader("Authorization");
+        return (bearer != null && bearer.startsWith("Bearer ")) ? bearer.substring(7) : null;
+    }
+}
+SecurityConfig.java
+java
+Copy
+Edit
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+public class SecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private JwtTokenFilter jwtTokenFilter;
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
+            .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }
