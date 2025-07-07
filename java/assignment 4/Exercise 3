@@ -1,6 +1,211 @@
-## Exercise 3: Resilience Patterns with Resilience4j
+##  1. User and Order Management System
+Technologies:
+Spring Boot 3
+OpenFeign or WebClient
+MySQL/PostgreSQL
+UserService (User Microservice)
+pom.xml
+xml
+Copy
+Edit
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+</dependency>
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-openfeign</artifactId>
+</dependency>
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-j</artifactId>
+</dependency>
+User.java
+java
+Copy
+Edit
+@Entity
+public class User {
+    @Id @GeneratedValue
+    private Long id;
+    private String name;
+    private String email;
+    // getters/setters
+}
+UserRepository.java
+java
+Copy
+Edit
+public interface UserRepository extends JpaRepository<User, Long> {}
+UserController.java
+java
+Copy
+Edit
+@RestController
+@RequestMapping("/users")
+public class UserController {
+    @Autowired private UserRepository userRepo;
 
-pom.xml (Add Dependencies)
+    @PostMapping
+    public User save(@RequestBody User user) {
+        return userRepo.save(user);
+    }
+
+    @GetMapping("/{id}")
+    public User get(@PathVariable Long id) {
+        return userRepo.findById(id).orElseThrow();
+    }
+}
+OrderService (Order Microservice)
+Order.java
+java
+Copy
+Edit
+@Entity
+public class Order {
+    @Id @GeneratedValue
+    private Long id;
+    private Long userId;
+    private String product;
+    private Double amount;
+    // getters/setters
+}
+OrderRepository.java
+java
+Copy
+Edit
+public interface OrderRepository extends JpaRepository<Order, Long> {}
+UserClient.java (OpenFeign)
+java
+Copy
+Edit
+@FeignClient(name = "user-service")
+public interface UserClient {
+    @GetMapping("/users/{id}")
+    User getUser(@PathVariable Long id);
+}
+OrderController.java
+java
+Copy
+Edit
+@RestController
+@RequestMapping("/orders")
+public class OrderController {
+    @Autowired private OrderRepository repo;
+    @Autowired private UserClient userClient;
+
+    @PostMapping
+    public Order save(@RequestBody Order order) {
+        userClient.getUser(order.getUserId()); // check user exists
+        return repo.save(order);
+    }
+
+    @GetMapping("/{id}")
+    public Order get(@PathVariable Long id) {
+        return repo.findById(id).orElseThrow();
+    }
+}
+
+2. Inventory Management System with Service Discovery
+Config Server Setup
+pom.xml
+xml
+Copy
+Edit
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-config-server</artifactId>
+</dependency>
+ConfigServerApplication.java
+java
+Copy
+Edit
+@EnableConfigServer
+@SpringBootApplication
+public class ConfigServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(ConfigServerApplication.class, args);
+    }
+}
+Eureka Discovery Server
+pom.xml
+xml
+Copy
+Edit
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+</dependency>
+EurekaServerApplication.java
+java
+Copy
+Edit
+@EnableEurekaServer
+@SpringBootApplication
+public class EurekaServerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(EurekaServerApplication.class, args);
+    }
+}
+ProductService (Product Management)
+Product.java
+java
+Copy
+Edit
+@Entity
+public class Product {
+    @Id @GeneratedValue
+    private Long id;
+    private String name;
+    private int stock;
+    // getters/setters
+}
+ProductController.java
+java
+Copy
+Edit
+@RestController
+@RequestMapping("/products")
+public class ProductController {
+    @Autowired private ProductRepository repo;
+
+    @GetMapping
+    public List<Product> list() {
+        return repo.findAll();
+    }
+}
+application.yml
+yaml
+Copy
+Edit
+spring:
+  application:
+    name: product-service
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+InventoryService (Inventory Tracking)
+InventoryController.java
+java
+Copy
+Edit
+@RestController
+@RequestMapping("/inventory")
+public class InventoryController {
+    @GetMapping("/status/{productId}")
+    public String checkStock(@PathVariable Long productId) {
+        // simulate stock lookup
+        return "In Stock";
+    }
+}
+
+3. API Gateway (Spring Cloud Gateway)
+pom.xml
 xml
 Copy
 Edit
@@ -9,72 +214,96 @@ Edit
     <artifactId>spring-cloud-starter-gateway</artifactId>
 </dependency>
 <dependency>
-    <groupId>io.github.resilience4j</groupId>
-    <artifactId>resilience4j-spring-boot2</artifactId>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
 </dependency>
-
-application.properties
-properties
+application.yml
+yaml
 Copy
 Edit
-resilience4j.circuitbreaker.instances.exampleCircuitBreaker.registerHealthIndicator=true
-resilience4j.circuitbreaker.instances.exampleCircuitBreaker.slidingWindowSize=10
-resilience4j.circuitbreaker.instances.exampleCircuitBreaker.failureRateThreshold=50
-ResilienceConfiguration.java
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: customer-service
+          uri: lb://CUSTOMER-SERVICE
+          predicates:
+            - Path=/customers/**
+          filters:
+            - name: RequestRateLimiter
+              args:
+                redis-rate-limiter.replenishRate: 10
+                redis-rate-limiter.burstCapacity: 20
+
+        - id: billing-service
+          uri: lb://BILLING-SERVICE
+          predicates:
+            - Path=/billing/**
+          filters:
+            - RewritePath=/billing/(?<segment>.*), /$\{segment}
+RateLimiterConfig.java
 java
 Copy
 Edit
-import io.github.resilience4j.circuitbreaker.CircuitBreakerConfig;
-import io.github.resilience4j.timelimiter.TimeLimiterConfig;
-import org.springframework.cloud.circuitbreaker.resilience4j.ReactiveResilience4JCircuitBreakerFactory;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.cloud.circuitbreaker.resilience4j.ReactiveResilience4JCircuitBreakerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.cloud.circuitbreaker.resilience4j.ReactiveResilience4JCircuitBreakerFactory;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
-import org.springframework.cloud.circuitbreaker.resilience4j.ReactiveResilience4JCircuitBreakerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.cloud.circuitbreaker.resilience4j.ReactiveResilience4JCircuitBreakerFactory;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
-import org.springframework.context.annotation.Bean;
-import org.springframework.cloud.circuitbreaker.resilience4j.ReactiveResilience4JCircuitBreakerFactory;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
-import org.springframework.cloud.circuitbreaker.resilience4j.ReactiveResilience4JCircuitBreakerFactory;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JCircuitBreakerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.cloud.circuitbreaker.resilience4j.Resilience4JConfigBuilder;
-
 @Configuration
-public class ResilienceConfiguration {
+public class RateLimiterConfig {
+    // optional custom Redis or in-memory rate limiting configuration
+}
 
-    @Bean
-    public Customizer<ReactiveResilience4JCircuitBreakerFactory> defaultCustomizer() {
-        return factory -> factory.configureDefault(id -> new Resilience4JConfigBuilder(id)
-                .circuitBreakerConfig(CircuitBreakerConfig.ofDefaults())
-                .timeLimiterConfig(TimeLimiterConfig.ofDefaults())
-                .build());
+4. Resilient Microservices with Circuit Breaker
+PaymentService with Resilience4j
+pom.xml
+xml
+Copy
+Edit
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+<dependency>
+    <groupId>io.github.resilience4j</groupId>
+    <artifactId>resilience4j-spring-boot3</artifactId>
+</dependency>
+application.yml
+yaml
+Copy
+Edit
+resilience4j:
+  circuitbreaker:
+    instances:
+      paymentService:
+        registerHealthIndicator: true
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5s
+PaymentService.java
+java
+Copy
+Edit
+@Service
+public class PaymentService {
+
+    @CircuitBreaker(name = "paymentService", fallbackMethod = "fallbackPayment")
+    public String callPaymentGateway() {
+        // simulate delay/failure
+        throw new RuntimeException("Timeout");
+    }
+
+    public String fallbackPayment(Throwable t) {
+        return "Payment service temporarily unavailable. Please try again.";
+    }
+}
+PaymentController.java
+java
+Copy
+Edit
+@RestController
+@RequestMapping("/payment")
+public class PaymentController {
+    @Autowired private PaymentService service;
+
+    @GetMapping("/process")
+    public String pay() {
+        return service.callPaymentGateway();
     }
 }
