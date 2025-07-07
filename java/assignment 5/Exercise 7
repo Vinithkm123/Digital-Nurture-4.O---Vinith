@@ -1,1 +1,88 @@
-## 
+##Exercise 7: Packages
+
+sql
+Copy
+Edit
+-- CustomerManagement package
+CREATE OR REPLACE PACKAGE CustomerManagement AS
+  PROCEDURE AddCustomer(p_id NUMBER, p_name VARCHAR2, p_dob DATE, p_balance NUMBER);
+  PROCEDURE UpdateCustomer(p_id NUMBER, p_name VARCHAR2);
+  FUNCTION GetBalance(p_id NUMBER) RETURN NUMBER;
+END;
+/
+
+CREATE OR REPLACE PACKAGE BODY CustomerManagement AS
+  PROCEDURE AddCustomer(p_id NUMBER, p_name VARCHAR2, p_dob DATE, p_balance NUMBER) IS
+  BEGIN
+    INSERT INTO Customers VALUES (p_id, p_name, p_dob, p_balance, SYSDATE);
+  END;
+
+  PROCEDURE UpdateCustomer(p_id NUMBER, p_name VARCHAR2) IS
+  BEGIN
+    UPDATE Customers SET Name = p_name WHERE CustomerID = p_id;
+  END;
+
+  FUNCTION GetBalance(p_id NUMBER) RETURN NUMBER IS
+    v_balance NUMBER;
+  BEGIN
+    SELECT Balance INTO v_balance FROM Customers WHERE CustomerID = p_id;
+    RETURN v_balance;
+  END;
+END;
+/
+
+-- EmployeeManagement package
+CREATE OR REPLACE PACKAGE EmployeeManagement AS
+  PROCEDURE Hire(p_id NUMBER, p_name VARCHAR2, p_pos VARCHAR2, p_sal NUMBER, p_dept VARCHAR2, p_date DATE);
+  PROCEDURE UpdateEmp(p_id NUMBER, p_sal NUMBER);
+  FUNCTION GetAnnualSalary(p_id NUMBER) RETURN NUMBER;
+END;
+/
+
+CREATE OR REPLACE PACKAGE BODY EmployeeManagement AS
+  PROCEDURE Hire(p_id NUMBER, p_name VARCHAR2, p_pos VARCHAR2, p_sal NUMBER, p_dept VARCHAR2, p_date DATE) IS
+  BEGIN
+    INSERT INTO Employees VALUES (p_id, p_name, p_pos, p_sal, p_dept, p_date);
+  END;
+
+  PROCEDURE UpdateEmp(p_id NUMBER, p_sal NUMBER) IS
+  BEGIN
+    UPDATE Employees SET Salary = p_sal WHERE EmployeeID = p_id;
+  END;
+
+  FUNCTION GetAnnualSalary(p_id NUMBER) RETURN NUMBER IS
+    v_sal NUMBER;
+  BEGIN
+    SELECT Salary INTO v_sal FROM Employees WHERE EmployeeID = p_id;
+    RETURN v_sal * 12;
+  END;
+END;
+/
+
+-- AccountOperations package
+CREATE OR REPLACE PACKAGE AccountOperations AS
+  PROCEDURE OpenAccount(p_id NUMBER, p_custID NUMBER, p_type VARCHAR2, p_bal NUMBER);
+  PROCEDURE CloseAccount(p_id NUMBER);
+  FUNCTION TotalBalance(p_custID NUMBER) RETURN NUMBER;
+END;
+/
+
+CREATE OR REPLACE PACKAGE BODY AccountOperations AS
+  PROCEDURE OpenAccount(p_id NUMBER, p_custID NUMBER, p_type VARCHAR2, p_bal NUMBER) IS
+  BEGIN
+    INSERT INTO Accounts VALUES (p_id, p_custID, p_type, p_bal, SYSDATE);
+  END;
+
+  PROCEDURE CloseAccount(p_id NUMBER) IS
+  BEGIN
+    DELETE FROM Accounts WHERE AccountID = p_id;
+  END;
+
+  FUNCTION TotalBalance(p_custID NUMBER) RETURN NUMBER IS
+    v_sum NUMBER;
+  BEGIN
+    SELECT SUM(Balance) INTO v_sum FROM Accounts WHERE CustomerID = p_custID;
+    RETURN v_sum;
+  END;
+END;
+/
