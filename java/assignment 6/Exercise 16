@@ -1,1 +1,119 @@
-##
+## Setup React App
+bash
+Copy
+Edit
+npx create-react-app mailregisterapp
+cd mailregisterapp
+npm start
+
+Create register.js Component
+src/register.js
+
+jsx
+Copy
+Edit
+import React, { useState } from 'react';
+
+const Register = () => {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const errors = {};
+
+    if (name.trim().length < 5) {
+      errors.name = 'Name must be at least 5 characters.';
+    }
+
+    if (!email.includes('@') || !email.includes('.')) {
+      errors.email = 'Enter a valid email (must include "@" and ".").';
+    }
+
+    if (password.length < 8) {
+      errors.password = 'Password must be at least 8 characters.';
+    }
+
+    return errors;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const validationErrors = validateForm();
+    setErrors(validationErrors);
+
+    if (Object.keys(validationErrors).length === 0) {
+      alert('Registration Successful!');
+      setName('');
+      setEmail('');
+      setPassword('');
+    }
+  };
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <h2>Mail Registration Form</h2>
+
+      <form onSubmit={handleSubmit}>
+
+        <div>
+          <label>Name:</label><br />
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Enter your name"
+          />
+          {errors.name && <p style={{ color: 'red' }}>{errors.name}</p>}
+        </div>
+
+        <div>
+          <label>Email:</label><br />
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+          />
+          {errors.email && <p style={{ color: 'red' }}>{errors.email}</p>}
+        </div>
+
+        <div>
+          <label>Password:</label><br />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter your password"
+          />
+          {errors.password && <p style={{ color: 'red' }}>{errors.password}</p>}
+        </div>
+
+        <button type="submit" style={{ marginTop: '10px' }}>Register</button>
+      </form>
+    </div>
+  );
+};
+
+export default Register;
+
+Use in App.js
+src/App.js
+
+jsx
+Copy
+Edit
+import React from 'react';
+import Register from './register';
+
+function App() {
+  return (
+    <div>
+      <Register />
+    </div>
+  );
+}
+
+export default App;
