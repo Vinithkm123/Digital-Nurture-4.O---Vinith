@@ -1,1 +1,86 @@
-##
+##Create the App
+bash
+Copy
+Edit
+npx create-react-app ticketraisingapp
+cd ticketraisingapp
+npm start
+
+Create ComplaintRegister.jsx
+jsx
+Copy
+Edit
+import React, { useState } from 'react';
+
+const ComplaintRegister = () => {
+  const [employeeName, setEmployeeName] = useState('');
+  const [complaintText, setComplaintText] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (employeeName.trim() === '' || complaintText.trim() === '') {
+      alert('Please fill out all fields.');
+      return;
+    }
+
+    const referenceNumber = 'REF' + Math.floor(Math.random() * 1000000);
+
+    alert(`Complaint submitted!\nReference Number: ${referenceNumber}`);
+
+    // Clear form
+    setEmployeeName('');
+    setComplaintText('');
+  };
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <h2>Raise Your Complaint</h2>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <label>Employee Name:</label><br />
+          <input
+            type="text"
+            value={employeeName}
+            onChange={(e) => setEmployeeName(e.target.value)}
+            placeholder="Enter your name"
+          />
+        </div>
+
+        <div style={{ marginTop: '10px' }}>
+          <label>Complaint Details:</label><br />
+          <textarea
+            value={complaintText}
+            onChange={(e) => setComplaintText(e.target.value)}
+            placeholder="Describe your issue here..."
+            rows={4}
+            cols={40}
+          ></textarea>
+        </div>
+
+        <div style={{ marginTop: '15px' }}>
+          <button type="submit">Submit Complaint</button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default ComplaintRegister;
+
+Use the Component in App.js
+jsx
+Copy
+Edit
+import React from 'react';
+import ComplaintRegister from './ComplaintRegister';
+
+function App() {
+  return (
+    <div>
+      <ComplaintRegister />
+    </div>
+  );
+}
+
+export default App;
