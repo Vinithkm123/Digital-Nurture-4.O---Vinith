@@ -1,1 +1,120 @@
-##
+##1. Create ThemeContext.js
+Inside /src folder:
+
+jsx
+Copy
+Edit
+import React from 'react';
+
+// Creating ThemeContext with default value 'light'
+const ThemeContext = React.createContext('light');
+
+export default ThemeContext;
+
+2. Modify App.js
+App.js
+
+jsx
+Copy
+Edit
+import React, { useState } from 'react';
+import EmployeesList from './EmployeesList';
+import ThemeContext from './ThemeContext';
+
+function App() {
+  const [theme, setTheme] = useState('light'); // light or dark
+
+  return (
+    <ThemeContext.Provider value={theme}>
+      <div>
+        <h1>Employee Management App</h1>
+
+        {/* Toggle Theme Button */}
+        <button onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}>
+          Switch to {theme === 'light' ? 'Dark' : 'Light'} Theme
+        </button>
+
+        {/* No more theme as props */}
+        <EmployeesList />
+      </div>
+    </ThemeContext.Provider>
+  );
+}
+
+export default App;
+
+3. Modify EmployeesList.js
+EmployeesList.js
+
+jsx
+Copy
+Edit
+import React from 'react';
+import EmployeeCard from './EmployeeCard';
+
+const EmployeesList = () => {
+  const employees = ['Alice', 'Bob', 'Charlie'];
+
+  return (
+    <div>
+      <h2>Employees List</h2>
+      {employees.map((name, index) => (
+        <EmployeeCard key={index} name={name} />
+      ))}
+    </div>
+  );
+};
+
+export default EmployeesList;
+
+Theme prop is no longer passed from here.
+
+
+4. Modify EmployeeCard.js
+EmployeeCard.js
+
+jsx
+Copy
+Edit
+import React, { useContext } from 'react';
+import ThemeContext from './ThemeContext';
+
+const EmployeeCard = ({ name }) => {
+  const theme = useContext(ThemeContext); // Access context directly here
+
+  return (
+    <div className={`card ${theme}`}>
+      <h3>{name}</h3>
+      <button className={theme}>View Profile</button>
+    </div>
+  );
+};
+
+export default EmployeeCard;
+
+Optional: Basic CSS Example
+css
+Copy
+Edit
+/* In App.css or index.css */
+
+button.light {
+  background-color: white;
+  color: black;
+}
+
+button.dark {
+  background-color: black;
+  color: white;
+}
+
+.card.light {
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+}
+
+.card.dark {
+  border: 1px solid #333;
+  background-color: #444;
+  color: white;
+}
