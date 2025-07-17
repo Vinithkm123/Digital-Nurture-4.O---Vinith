@@ -1,1 +1,93 @@
-##
+##Create React App
+bash
+Copy
+Edit
+npx create-react-app officespacerentalapp
+cd officespacerentalapp
+code .
+
+Modify App.js
+File Path: src/App.js
+
+javascript
+Copy
+Edit
+import React from 'react';
+
+function App() {
+  // Object to represent a single office
+  const office1 = {
+    name: 'Skyview Corporate Office',
+    rent: 55000,
+    address: 'Bangalore, India'
+  };
+
+  // List of multiple office spaces
+  const officeSpaces = [
+    { id: 1, name: 'Greenfield Tower', rent: 45000, address: 'Chennai, India' },
+    { id: 2, name: 'BlueSky Offices', rent: 75000, address: 'Hyderabad, India' },
+    { id: 3, name: 'EcoSpace Hub', rent: 68000, address: 'Pune, India' },
+    { id: 4, name: 'TechPark Elite', rent: 52000, address: 'Mumbai, India' }
+  ];
+
+  return (
+    <div style={{ textAlign: 'center' }}>
+      <h1>Office Space Rental Portal</h1>
+
+      <img 
+        src="https://via.placeholder.com/600x200?text=Office+Space" 
+        alt="Office Space" 
+        style={{ width: '60%', marginBottom: '20px' }} 
+      />
+
+      <h2>Featured Office</h2>
+      <p><strong>Name:</strong> {office1.name}</p>
+      <p>
+        <strong>Rent:</strong> 
+        <span style={{ color: office1.rent < 60000 ? 'red' : 'green' }}>
+          ₹{office1.rent}
+        </span>
+      </p>
+      <p><strong>Address:</strong> {office1.address}</p>
+
+      <h2>Available Office Spaces</h2>
+      {officeSpaces.map(office => (
+        <div key={office.id} style={{ border: '1px solid black', margin: '10px', padding: '10px' }}>
+          <p><strong>Name:</strong> {office.name}</p>
+          <p>
+            <strong>Rent:</strong> 
+            <span style={{ color: office.rent < 60000 ? 'red' : 'green' }}>
+              ₹{office.rent}
+            </span>
+          </p>
+          <p><strong>Address:</strong> {office.address}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default App;
+
+Concepts Used:
+JSX Syntax for building UI.
+
+React.createElement() equivalent through JSX.
+
+JavaScript expressions in JSX.
+
+Inline CSS to apply color styles dynamically.
+
+List rendering using map().
+
+Run the App
+bash
+Copy
+Edit
+npm start
+Visit:
+
+arduino
+Copy
+Edit
+http://localhost:3000
