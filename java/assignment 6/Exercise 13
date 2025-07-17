@@ -1,1 +1,129 @@
-##
+##Create React App
+
+bash
+Copy
+Edit
+npx create-react-app bloggerapp
+cd bloggerapp
+npm start
+Project Structure
+css
+Copy
+Edit
+src/
+├── components/
+│   ├── BookDetails.jsx
+│   ├── BlogDetails.jsx
+│   └── CourseDetails.jsx
+├── App.js
+└── index.js
+Component Code
+BookDetails.jsx
+jsx
+Copy
+Edit
+import React from 'react';
+
+const BookDetails = () => {
+  return (
+    <div>
+      <h2>Book Details</h2>
+      <p>This is information about books.</p>
+    </div>
+  );
+};
+
+export default BookDetails;
+
+BlogDetails.jsx
+jsx
+Copy
+Edit
+import React from 'react';
+
+const BlogDetails = () => {
+  return (
+    <div>
+      <h2>Blog Details</h2>
+      <p>This is information about blogs.</p>
+    </div>
+  );
+};
+
+export default BlogDetails;
+
+CourseDetails.jsx
+jsx
+Copy
+Edit
+import React from 'react';
+
+const CourseDetails = () => {
+  return (
+    <div>
+      <h2>Course Details</h2>
+      <p>This is information about courses.</p>
+    </div>
+  );
+};
+
+export default CourseDetails;
+
+App.js (Conditional Rendering Examples)
+jsx
+Copy
+Edit
+import React, { useState } from 'react';
+import BookDetails from './components/BookDetails';
+import BlogDetails from './components/BlogDetails';
+import CourseDetails from './components/CourseDetails';
+
+function App() {
+  const [show, setShow] = useState('book'); // book, blog, course
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+
+  const courses = ['React', 'Node.js', 'JavaScript', 'MongoDB'];
+
+  return (
+    <div style={{ padding: '20px' }}>
+      <h1>Blogger App</h1>
+
+      <button onClick={() => setShow('book')}>Show Book</button>
+      <button onClick={() => setShow('blog')}>Show Blog</button>
+      <button onClick={() => setShow('course')}>Show Course</button>
+
+      <hr />
+
+      {/* 1. if-else style conditional rendering */}
+      {isLoggedIn ? <p>Welcome, User!</p> : <p>Please Login!</p>}
+
+      {/* 2. Element variable approach */}
+      {(() => {
+        if (show === 'book') return <BookDetails />;
+        if (show === 'blog') return <BlogDetails />;
+        if (show === 'course') return <CourseDetails />;
+        return <p>Select an option above.</p>;
+      })()}
+
+      {/* 3. Ternary Operator */}
+      <div>
+        {show === 'blog' ? <p>You are viewing Blogs.</p> : <p>Not Blogs!</p>}
+      </div>
+
+      {/* 4. Logical AND operator */}
+      {show === 'course' && <p>You have selected Course section.</p>}
+
+      <hr />
+
+      {/* 5. Rendering List with keys */}
+      <h3>Course List</h3>
+      <ul>
+        {courses.map((course, index) => (
+          <li key={index}>{course}</li>  {/* key example */}
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default App;
