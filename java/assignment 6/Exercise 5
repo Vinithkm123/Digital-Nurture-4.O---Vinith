@@ -1,1 +1,83 @@
-##
+##Create CohortDetails.module.css
+Path: src/CohortDetails.module.css
+
+css
+Copy
+Edit
+.box {
+  width: 300px;
+  display: inline-block;
+  margin: 10px;
+  padding: 10px 20px;
+  border: 1px solid black;
+  border-radius: 10px;
+}
+
+dt {
+  font-weight: 500;
+}
+
+Example CohortDetails.js Component
+Path: src/CohortDetails.js
+
+javascript
+Copy
+Edit
+import React from 'react';
+import styles from './CohortDetails.module.css';
+
+function CohortDetails({ name, startDate, status }) {
+  const statusStyle = {
+    color: status === 'ongoing' ? 'green' : 'blue'
+  };
+
+  return (
+    <div className={styles.box}>
+      <h3 style={statusStyle}>{name}</h3>
+      <dl>
+        <dt>Start Date:</dt>
+        <dd>{startDate}</dd>
+        <dt>Status:</dt>
+        <dd>{status}</dd>
+      </dl>
+    </div>
+  );
+}
+
+export default CohortDetails;
+
+Example App.js to Render Multiple Cohorts
+Path: src/App.js
+
+javascript
+Copy
+Edit
+import React from 'react';
+import CohortDetails from './CohortDetails';
+
+function App() {
+  return (
+    <div>
+      <CohortDetails name="React Bootcamp" startDate="2025-07-01" status="ongoing" />
+      <CohortDetails name="Node.js Workshop" startDate="2025-06-15" status="completed" />
+      <CohortDetails name="Python Basics" startDate="2025-05-10" status="completed" />
+    </div>
+  );
+}
+
+export default App;
+
+Run the App
+In terminal:
+
+bash
+Copy
+Edit
+npm install
+npm start
+Open:
+
+arduino
+Copy
+Edit
+http://localhost:3000
