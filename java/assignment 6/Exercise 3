@@ -1,1 +1,120 @@
-##
+## Create React App
+bash
+Copy
+Edit
+npx create-react-app scorecalculatorapp
+
+Create Components Folder and File
+Inside the src folder, create a folder:
+
+nginx
+Copy
+Edit
+Components
+Inside Components, create a file:
+
+Copy
+Edit
+CalculateScore.js
+
+Code for CalculateScore.js
+javascript
+Copy
+Edit
+import React from 'react';
+import '../Stylesheets/mystyle.css';
+
+function CalculateScore(props) {
+  const { name, school, total, goal } = props;
+
+  const average = total / goal;
+
+  return (
+    <div className="score-card">
+      <h2>Student Score Summary</h2>
+      <p><strong>Name:</strong> {name}</p>
+      <p><strong>School:</strong> {school}</p>
+      <p><strong>Total Marks:</strong> {total}</p>
+      <p><strong>Subjects:</strong> {goal}</p>
+      <p><strong>Average Score:</strong> {average.toFixed(2)}</p>
+    </div>
+  );
+}
+
+export default CalculateScore;
+
+Create Stylesheets Folder and CSS File
+In src, create a folder:
+
+nginx
+Copy
+Edit
+Stylesheets
+Inside Stylesheets, create a CSS file:
+
+Copy
+Edit
+mystyle.css
+
+Code for mystyle.css
+css
+Copy
+Edit
+.score-card {
+  border: 2px solid #4CAF50;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  width: 300px;
+  margin: 20px auto;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+.score-card h2 {
+  color: #4CAF50;
+}
+
+.score-card p {
+  font-size: 16px;
+}
+
+Edit App.js to Render Component
+src/App.js
+
+javascript
+Copy
+Edit
+import React from 'react';
+import CalculateScore from './Components/CalculateScore';
+
+function App() {
+  return (
+    <div>
+      <CalculateScore
+        name="John Doe"
+        school="ABC High School"
+        total={450}
+        goal={5}
+      />
+    </div>
+  );
+}
+
+export default App;
+
+Run the Application
+In terminal:
+
+bash
+Copy
+Edit
+npm start
+
+View in Browser
+Open:
+
+arduino
+Copy
+Edit
+http://localhost:3000
