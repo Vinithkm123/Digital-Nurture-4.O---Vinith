@@ -1,1 +1,167 @@
-##
+## Create React App
+bash
+Copy
+Edit
+npx create-react-app TrainersApp
+cd TrainersApp
+npm install react-router-dom
+code .
+
+Create trainer.js
+File: src/trainer.js
+
+javascript
+Copy
+Edit
+class Trainer {
+  constructor(trainerId, name, email, phone, technology, skills) {
+    this.trainerId = trainerId;
+    this.name = name;
+    this.email = email;
+    this.phone = phone;
+    this.technology = technology;
+    this.skills = skills;
+  }
+}
+
+export default Trainer;
+
+Create TrainersMock.js
+File: src/TrainersMock.js
+
+javascript
+Copy
+Edit
+import Trainer from './trainer';
+
+const trainers = [
+  new Trainer(1, 'John Doe', 'john@example.com', '1234567890', 'React', 'JSX, Hooks'),
+  new Trainer(2, 'Jane Smith', 'jane@example.com', '9876543210', 'Angular', 'Directives, Services'),
+  new Trainer(3, 'Sam Wilson', 'sam@example.com', '4561237890', 'Vue', 'Components, Vuex'),
+];
+
+export default trainers;
+
+Create TrainersList.js
+File: src/TrainersList.js
+
+javascript
+Copy
+Edit
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+function TrainersList({ data }) {
+  return (
+    <div>
+      <h2>Trainers List</h2>
+      <ul>
+        {data.map(trainer => (
+          <li key={trainer.trainerId}>
+            <Link to={`/trainer/${trainer.trainerId}`}>{trainer.name}</Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default TrainersList;
+
+Create Home.js
+File: src/Home.js
+
+javascript
+Copy
+Edit
+import React from 'react';
+
+function Home() {
+  return (
+    <div>
+      <h2>Welcome to Cognizant Academy Trainers Portal</h2>
+    </div>
+  );
+}
+
+export default Home;
+
+Create TrainerDetails.js
+File: src/TrainerDetails.js
+
+javascript
+Copy
+Edit
+import React from 'react';
+import { useParams } from 'react-router-dom';
+import trainers from './TrainersMock';
+
+function TrainerDetails() {
+  const { id } = useParams();
+  const trainer = trainers.find(t => t.trainerId === parseInt(id));
+
+  if (!trainer) {
+    return <h2>Trainer Not Found</h2>;
+  }
+
+  return (
+    <div>
+      <h2>Trainer Details</h2>
+      <p><strong>ID:</strong> {trainer.trainerId}</p>
+      <p><strong>Name:</strong> {trainer.name}</p>
+      <p><strong>Email:</strong> {trainer.email}</p>
+      <p><strong>Phone:</strong> {trainer.phone}</p>
+      <p><strong>Technology:</strong> {trainer.technology}</p>
+      <p><strong>Skills:</strong> {trainer.skills}</p>
+    </div>
+  );
+}
+
+export default TrainerDetails;
+
+Modify App.js
+File: src/App.js
+
+javascript
+Copy
+Edit
+import React from 'react';
+import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import Home from './Home';
+import TrainersList from './TrainersList';
+import TrainerDetails from './TrainerDetails';
+import trainers from './TrainersMock';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div>
+        <h1>Trainers Management Portal</h1>
+        <nav>
+          <Link to="/">Home</Link> | <Link to="/trainers">Trainers</Link>
+        </nav>
+        <hr />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/trainers" element={<TrainersList data={trainers} />} />
+          <Route path="/trainer/:id" element={<TrainerDetails />} />
+        </Routes>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+
+Run the App
+bash
+Copy
+Edit
+npm start
+Then open:
+
+arduino
+Copy
+Edit
+http://localhost:3000
+
