@@ -1,1 +1,119 @@
-##
+## Define SPA and its Benefits
+SPA (Single Page Application):
+A web application that loads a single HTML page and updates content dynamically without refreshing the whole page.
+
+Benefits of SPA:
+Faster user experience after first load.
+Reduces server load since only data (not full pages) is transferred.
+Smooth navigation without full-page reloads.
+
+##Define React and Explain How It Works
+React:
+A JavaScript library for building fast, interactive user interfaces.
+
+How React Works:
+React breaks your UI into small reusable pieces called components. It uses a virtual DOM to efficiently update only the parts of the page that change, making the app fast.
+
+##Differences Between SPA and MPA
+Feature	SPA (Single Page Application)	MPA (Multi Page Application)
+Page Load	Loads once, content updates dynamically	Loads a new page for each request
+Speed	Faster after first load	Slower due to full page reloads
+Navigation	Smooth, no page refresh	Traditional, with page reloads
+Example	Gmail, Facebook	Amazon, Flipkart (older versions)
+
+##Pros & Cons of SPA
+Pros:
+
+Fast and responsive after initial load.
+
+Reusable components.
+
+Better user experience.
+
+Cons:
+
+SEO challenges (since it’s a single page).
+
+Initial load can be slow.
+
+Requires JavaScript to work.
+
+##Define Virtual DOM
+Virtual DOM:
+A lightweight copy of the real DOM (Document Object Model).
+React uses this virtual DOM to track changes and update only the necessary parts of the page, making updates much faster.
+
+##Features of React
+Component-based architecture.
+
+Uses Virtual DOM for fast rendering.
+
+One-way data binding.
+
+Reusable and modular code.
+
+Supports hooks (for using state and lifecycle features).
+
+Easy to integrate with other libraries.
+
+Steps to Create React App
+##Install create-react-app (optional step, globally)
+bash
+Copy
+Edit
+npm install -g create-react-app
+(Optional: You can skip this step and directly use npx in the next step.)
+
+##Create React Project
+bash
+Copy
+Edit
+npx create-react-app myfirstreact
+
+##Navigate to Project Folder
+bash
+Copy
+Edit
+cd myfirstreact
+
+##Open Project in VS Code
+bash
+Copy
+Edit
+code 
+
+## Modify App.js
+Go to the src/App.js file.
+
+Delete the existing content.
+
+Replace with the following code:
+
+javascript
+Copy
+Edit
+import React from 'react';
+
+function App() {
+  return (
+    <div>
+      <h1>Welcome to the first session of React</h1>
+    </div>
+  );
+}
+
+export default App;
+
+##Start React Application
+bash
+Copy
+Edit
+npm start
+
+##View in Browser
+Open your browser and go to:
+
+arduino
+Copy
+Edit
+http://localhost:3000
