@@ -1,1 +1,148 @@
-##
+## Create React App
+bash
+Copy
+Edit
+npx create-react-app eventexamplesapp
+cd eventexamplesapp
+code .
+
+Create EventExamples.js
+File Path: src/EventExamples.js
+
+javascript
+Copy
+Edit
+import React, { Component } from 'react';
+
+class EventExamples extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      count: 0
+    };
+    this.sayHello = this.sayHello.bind(this);
+  }
+
+  increment = () => {
+    this.setState(prevState => ({
+      count: prevState.count + 1
+    }));
+  }
+
+  decrement = () => {
+    this.setState(prevState => ({
+      count: prevState.count - 1
+    }));
+  }
+
+  sayHello() {
+    console.log('Hello! This is a static message.');
+  }
+
+  multipleMethods = () => {
+    this.increment();
+    this.sayHello();
+  }
+
+  sayWelcome = (msg) => {
+    alert(`Welcome ${msg}`);
+  }
+
+  handleSyntheticEvent = (event) => {
+    alert('I was clicked!');
+    console.log('Synthetic Event:', event);
+  }
+
+  render() {
+    return (
+      <div style={{ textAlign: 'center' }}>
+        <h2>Event Handling Example</h2>
+        <p>Count: {this.state.count}</p>
+
+        <button onClick={this.multipleMethods}>Increase (Multiple Methods)</button><br/><br/>
+        <button onClick={this.decrement}>Decrease</button><br/><br/>
+
+        <button onClick={() => this.sayWelcome('User')}>Say Welcome</button><br/><br/>
+
+        <button onClick={this.handleSyntheticEvent}>Synthetic Event Button</button>
+      </div>
+    );
+  }
+}
+
+export default EventExamples;
+
+Create CurrencyConvertor.js
+File Path: src/CurrencyConvertor.js
+
+javascript
+Copy
+Edit
+import React, { Component } from 'react';
+
+class CurrencyConvertor extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      rupees: '',
+      euros: ''
+    };
+  }
+
+  handleChange = (event) => {
+    this.setState({ rupees: event.target.value });
+  }
+
+  handleSubmit = () => {
+    const euros = parseFloat(this.state.rupees) / 90;  // Approximate conversion
+    this.setState({ euros: euros.toFixed(2) });
+  }
+
+  render() {
+    return (
+      <div style={{ textAlign: 'center', marginTop: '30px' }}>
+        <h2>Currency Convertor (INR to EURO)</h2>
+        <input
+          type="text"
+          placeholder="Enter amount in INR"
+          value={this.state.rupees}
+          onChange={this.handleChange}
+        />
+        <button onClick={this.handleSubmit}>Convert</button>
+        <p>Amount in Euro: €{this.state.euros}</p>
+      </div>
+    );
+  }
+}
+
+export default CurrencyConvertor;
+
+Modify App.js
+File Path: src/App.js
+
+javascript
+Copy
+Edit
+import React from 'react';
+import EventExamples from './EventExamples';
+import CurrencyConvertor from './CurrencyConvertor';
+
+function App() {
+  return (
+    <div>
+      <EventExamples />
+      <CurrencyConvertor />
+    </div>
+  );
+}
+
+
+Copy
+Edit
+npm start
+Open:
+
+arduino
+Copy
+Edit
+http://localhost:3000
