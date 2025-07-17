@@ -1,1 +1,121 @@
-##
+## Create React App
+bash
+Copy
+Edit
+npx create-react-app shoppingapp
+cd shoppingapp
+code .
+
+Create Cart.js
+Path: src/Cart.js
+
+javascript
+Copy
+Edit
+import React, { Component } from 'react';
+
+class Cart extends Component {
+  render() {
+    return (
+      <div style={{ border: '1px solid gray', margin: '10px', padding: '10px' }}>
+        <h3>Item: {this.props.itemname}</h3>
+        <p>Price: ₹{this.props.price}</p>
+      </div>
+    );
+  }
+}
+
+export default Cart;
+
+Create OnlineShopping.js
+Path: src/OnlineShopping.js
+
+javascript
+Copy
+Edit
+import React, { Component } from 'react';
+import Cart from './Cart';
+
+class OnlineShopping extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      cartItems: [
+        { itemname: 'Laptop', price: 60000 },
+        { itemname: 'Headphones', price: 2000 },
+        { itemname: 'Keyboard', price: 1500 },
+        { itemname: 'Mouse', price: 800 },
+        { itemname: 'Monitor', price: 12000 }
+      ]
+    };
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>Shopping Cart Items</h1>
+        {this.state.cartItems.map((item, index) => (
+          <Cart
+            key={index}
+            itemname={item.itemname}
+            price={item.price}
+          />
+        ))}
+      </div>
+    );
+  }
+}
+
+export default OnlineShopping;
+
+Modify App.js
+Path: src/App.js
+
+javascript
+Copy
+Edit
+import React from 'react';
+import OnlineShopping from './OnlineShopping';
+
+function App() {
+  return (
+    <div>
+      <OnlineShopping />
+    </div>
+  );
+}
+
+export default App;
+
+Apply ReactDOM.render() (in index.js)
+src/index.js (this is default but just to clarify):
+
+javascript
+Copy
+Edit
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import './index.css';
+import App from './App';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+
+Explanation
+Cart component uses props (itemname and price).
+
+OnlineShopping component stores the items in state and passes them as props to Cart.
+
+ReactDOM.render() is used in index.js to render the entire app.
+
+Run the App
+bash
+Copy
+Edit
+npm start
+Then visit:
+
+arduino
+Copy
+Edit
+http://localhost:3000
