@@ -1,0 +1,36 @@
+##Exercise 3 : Logging with Spring AOP
+Additional pom.xml Dependency:
+
+xml
+Copy
+Edit
+<dependency>
+    <groupId>org.springframework</groupId>
+    <artifactId>spring-aspects</artifactId>
+    <version>5.3.34</version>
+</dependency>
+Extend applicationContext.xml
+xml
+Copy
+Edit
+<context:component-scan base-package="com.library" />
+<aop:aspectj-autoproxy />
+LoggingAspect.java
+java
+Copy
+Edit
+package com.library.aspect;
+
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.springframework.stereotype.Component;
+
+@Aspect
+@Component
+public class LoggingAspect {
+
+    @Before("execution(* com.library.service.*.*(..))")
+    public void logBeforeMethod() {
+        System.out.println("[LOG] Method execution starting...");
+    }
+}
