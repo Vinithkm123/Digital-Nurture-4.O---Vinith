@@ -1,1 +1,197 @@
-##
+## pom.xml Dependencies
+
+xml
+Copy
+Edit
+<dependencies>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>com.h2database</groupId>
+        <artifactId>h2</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+    </dependency>
+</dependencies>
+
+
+application.properties
+properties
+Copy
+Edit
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=password
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+spring.h2.console.enabled=true
+spring.jpa.show-sql=true
+spring.jpa.hibernate.ddl-auto=update
+
+
+Entity Classes
+Department.java
+java
+Copy
+Edit
+package com.example.ems.model;
+
+import lombok.Data;
+import javax.persistence.*;
+import java.util.List;
+
+@Entity
+@Table(name = "department")
+@Data
+public class Department {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+    private List<Employee> employees;
+}
+Employee.java
+java
+Copy
+Edit
+package com.example.ems.model;
+
+import lombok.Data;
+import javax.persistence.*;
+
+@Entity
+@Table(name = "employee")
+@Data
+public class Employee {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+    private String email;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id")
+    private Department department;
+}
+
+
+Repository Interfaces
+DepartmentRepository.java
+java
+Copy
+Edit
+package com.example.ems.repository;
+
+import com.example.ems.model.Department;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface DepartmentRepository extends JpaRepository<Department, Long> {
+}
+EmployeeRepository.java
+java
+Copy
+Edit
+package com.example.ems.repository;
+
+import com.example.ems.model.Employee;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+}
+
+
+Controller Classes
+DepartmentController.java
+java
+Copy
+Edit
+package com.example.ems.controller;
+
+import com.example.ems.model.Department;
+import com.example.ems.repository.DepartmentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/departments")
+public class DepartmentController {
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
+
+    @GetMapping
+    public List<Department> getAllDepartments() {
+        return departmentRepository.findAll();
+    }
+
+    @PostMapping
+    public Department addDepartment(@RequestBody Department department) {
+        return departmentRepository.save(department);
+    }
+}
+EmployeeController.java
+java
+Copy
+Edit
+package com.example.ems.controller;
+
+import com.example.ems.model.Employee;
+import com.example.ems.repository.EmployeeRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/employees")
+public class EmployeeController {
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @GetMapping
+    public List<Employee> getAllEmployees() {
+        return employeeRepository.findAll();
+    }
+
+    @PostMapping
+    public Employee addEmployee(@RequestBody Employee employee) {
+        return employeeRepository.save(employee);
+    }
+}
+
+Main Application Class
+java
+Copy
+Edit
+package com.example.ems;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class EmployeeManagementSystemApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(EmployeeManagementSystemApplication.class, args);
+    }
+}
