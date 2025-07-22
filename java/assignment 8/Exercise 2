@@ -1,1 +1,194 @@
-##
+## Spring Data JPA – Query Methods + Relationships
+
+CountryRepository.java (Query Methods)
+java
+Copy
+Edit
+package com.cognizant.ormlearn.repository;
+
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import com.cognizant.ormlearn.model.Country;
+
+@Repository
+public interface CountryRepository extends JpaRepository<Country, String> {
+
+    // Search countries containing substring
+    List<Country> findByNameContaining(String text);
+
+    // Search countries containing substring sorted by name ascending
+    List<Country> findByNameContainingOrderByNameAsc(String text);
+
+    // Countries starting with a letter
+    List<Country> findByNameStartingWith(String prefix);
+
+}
+
+
+Stock.java
+java
+Copy
+Edit
+package com.cognizant.ormlearn.model;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.util.Date;
+
+@Entity
+@Table(name = "stock")
+public class Stock {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "st_id")
+    private int id;
+
+    @Column(name = "st_code")
+    private String code;
+
+    @Column(name = "st_date")
+    private Date date;
+
+    @Column(name = "st_open")
+    private BigDecimal open;
+
+    @Column(name = "st_close")
+    private BigDecimal close;
+
+    @Column(name = "st_volume")
+    private BigDecimal volume;
+
+    // getters, setters, toString()
+}
+
+
+StockRepository.java (Query Methods)
+java
+Copy
+Edit
+package com.cognizant.ormlearn.repository;
+
+import java.util.Date;
+import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import com.cognizant.ormlearn.model.Stock;
+
+@Repository
+public interface StockRepository extends JpaRepository<Stock, Integer> {
+
+    // FB stock for Sep 2019
+    List<Stock> findByCodeAndDateBetween(String code, Date start, Date end);
+
+    // Google stocks where close > 1250
+    List<Stock> findByCodeAndCloseGreaterThan(String code, double close);
+
+    // Top 3 highest volume days (requires Pageable)
+    List<Stock> findTop3ByOrderByVolumeDesc();
+
+    // Lowest Netflix stocks (using open price, for example)
+    List<Stock> findTop3ByCodeOrderByCloseAsc(String code);
+
+}
+
+
+Entity Relationships Example
+Employee.java
+java
+Copy
+Edit
+@Entity
+@Table(name = "employee")
+public class Employee {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    private String name;
+    private double salary;
+    private boolean permanent;
+    private Date dateOfBirth;
+
+    @ManyToOne
+    @JoinColumn(name = "em_dp_id")
+    private Department department;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "employee_skill",
+            joinColumns = @JoinColumn(name = "es_em_id"),
+            inverseJoinColumns = @JoinColumn(name = "es_sk_id"))
+    private Set<Skill> skillList;
+
+    // getters, setters
+}
+Department.java
+java
+Copy
+Edit
+@Entity
+@Table(name = "department")
+public class Department {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    private String name;
+
+    @OneToMany(mappedBy = "department", fetch = FetchType.EAGER)
+    private Set<Employee> employeeList;
+
+    // getters, setters
+}
+Skill.java
+java
+Copy
+Edit
+@Entity
+@Table(name = "skill")
+public class Skill {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+    private String name;
+
+    @ManyToMany(mappedBy = "skillList")
+    private Set<Employee> employeeList;
+
+    // getters, setters
+}
+
+
+Using Query Methods in Service / Main Class
+java
+Copy
+Edit
+@Autowired
+private CountryRepository countryRepository;
+
+@Autowired
+private StockRepository stockRepository;
+
+private void searchCountries() {
+    List<Country> countries = countryRepository.findByNameContaining("ou");
+    countries.forEach(System.out::println);
+
+    List<Country> sortedCountries = countryRepository.findByNameContainingOrderByNameAsc("ou");
+    sortedCountries.forEach(System.out::println);
+
+    List<Country> countriesByLetter = countryRepository.findByNameStartingWith("Z");
+    countriesByLetter.forEach(System.out::println);
+}
+
+private void stockQueries() {
+    Date startDate = ... // Set 2019-09-01
+    Date endDate = ...   // Set 2019-09-30
+
+    List<Stock> fbStocks = stockRepository.findByCodeAndDateBetween("FB", startDate, endDate);
+    List<Stock> googleStocks = stockRepository.findByCodeAndCloseGreaterThan("GOOGL", 1250);
+    List<Stock> topVolumeStocks = stockRepository.findTop3ByOrderByVolumeDesc();
+    List<Stock> lowestNetflixStocks = stockRepository.findTop3ByCodeOrderByCloseAsc("NFLX");
+}
