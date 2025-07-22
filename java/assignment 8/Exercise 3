@@ -1,1 +1,106 @@
-##
+## HQL, Native Queries & Criteria API
+
+
+Get Permanent Employees using HQL
+EmployeeRepository.java
+
+java
+Copy
+Edit
+@Query("SELECT e FROM Employee e WHERE e.permanent = true")
+List<Employee> getAllPermanentEmployees();
+Optimized with Fetch Joins (Avoiding N+1 Query Problem):
+
+java
+Copy
+Edit
+@Query("SELECT e FROM Employee e LEFT JOIN FETCH e.department d LEFT JOIN FETCH e.skillList WHERE e.permanent = true")
+List<Employee> getAllPermanentEmployeesWithDetails();
+ 
+Get Average Salary by Department using HQL
+EmployeeRepository.java
+
+java
+Copy
+Edit
+@Query("SELECT AVG(e.salary) FROM Employee e WHERE e.department.id = :deptId")
+double getAverageSalaryByDepartment(@Param("deptId") int departmentId);
+
+
+Native Query: Get All Employees
+EmployeeRepository.java
+
+java
+Copy
+Edit
+@Query(value = "SELECT * FROM employee", nativeQuery = true)
+List<Employee> getAllEmployeesNative();
+
+
+Fetch Quiz Attempt Details using HQL (Concept)
+Assuming you have entities:
+
+Attempt
+
+AttemptQuestion
+
+AttemptOption
+
+User
+
+Question
+
+Options
+
+In AttemptRepository.java:
+
+java
+Copy
+Edit
+@Query("SELECT a FROM Attempt a " +
+       "JOIN FETCH a.user " +
+       "JOIN FETCH a.attemptQuestions aq " +
+       "JOIN FETCH aq.question q " +
+       "JOIN FETCH aq.attemptOptions ao " +
+       "JOIN FETCH ao.option o " +
+       "WHERE a.id = :attemptId AND a.user.id = :userId")
+Attempt getAttemptDetails(@Param("userId") int userId, @Param("attemptId") int attemptId);
+Note: Use fetch joins where immediate data is required.
+
+Avoid fetch joins on collections if lazy loading suffices.
+
+
+
+Criteria API Example
+Used when dynamic filtering is needed (no static @Query):
+
+java
+Copy
+Edit
+@Autowired
+private EntityManager entityManager;
+
+public List<Product> searchProducts(String keyword, Double minPrice, Double maxPrice) {
+    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+    CriteriaQuery<Product> cq = cb.createQuery(Product.class);
+    Root<Product> root = cq.from(Product.class);
+
+    List<Predicate> predicates = new ArrayList<>();
+
+    if (keyword != null) {
+        predicates.add(cb.like(root.get("name"), "%" + keyword + "%"));
+    }
+
+    if (minPrice != null) {
+        predicates.add(cb.ge(root.get("price"), minPrice));
+    }
+
+    if (maxPrice != null) {
+        predicates.add(cb.le(root.get("price"), maxPrice));
+    }
+
+    cq.where(predicates.toArray(new Predicate[0]));
+
+    return entityManager.createQuery(cq).getResultList();
+}
+
