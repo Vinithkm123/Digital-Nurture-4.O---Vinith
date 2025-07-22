@@ -1,0 +1,21 @@
+## Exercise 7 & 8: Constructor and Setter Injection
+Constructor injection in XML:
+
+xml
+Copy
+Edit
+<bean id="bookService" class="com.library.service.BookService">
+    <constructor-arg ref="bookRepository"/>
+</bean>
+Modify BookService.java:
+
+java
+Copy
+Edit
+public class BookService {
+    private BookRepository bookRepository;
+
+    public BookService(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
+}
